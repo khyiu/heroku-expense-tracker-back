@@ -47,6 +47,10 @@
 				<version>3.0.4</version>
 				<configuration>
 					<appName>heroku-expense-tracker-back</appName>
+					<jdkVersion>13</jdkVersion>
+					<processTypes>
+						<web>java $JAVA_OPTS -cp target/classes:target/dependency/* be.kuritsu.hetb.HerokuExpenseTrackerBackApplication</web>
+					</processTypes>
 				</configuration>
 			</plugin>
 		</plugins>
