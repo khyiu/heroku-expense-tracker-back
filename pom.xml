@@ -16,6 +16,10 @@
 		<java.version>13</java.version>
 		<maven.compiler.source>13</maven.compiler.source>
 		<maven.compiler.target>13</maven.compiler.target>
+		<!-- SonarCloud -->
+		<sonar.projectKey>khyiu_heroku-expense-tracker-back</sonar.projectKey>
+		<sonar.organization>khyiu</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 	<dependencies>
 		<dependency>

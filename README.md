@@ -52,3 +52,14 @@ spring.liquibase.change-log=db/changelog/db.changelog-master.xml
    - `spring-boot-starter-jdbc`, mainly to get necessary DataSource implementation classes and Connection Pool classes
    - `postgresql` to get the PostgreSQL driver necessary to Liquibase
    - 'liquibase-core'
+   
+### 4 CI/CD : CircleCI
+Setup a CircleCI project using their template -> adding `.circleci/config.yaml` file
+
+### 5 Code analysis : SonarCloud
+In SonarCloud, create a new project:
+   - organization = `khyiu` (my github username)
+   - project = the current project
+   - select CircleCI as analysis source
+   - follow the instructions to create a CircleCI context + add the environment variables
+   - select maven as being the build tool and follow the instructions to complete the Maven config + the CircleCI `config.yml` files
