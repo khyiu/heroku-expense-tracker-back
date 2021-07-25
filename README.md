@@ -28,3 +28,27 @@ This key can be found in the user settings in Heroku
     </processTypes>
 </configuration>
 ```
+7. To manually deploy, run `mvn heroku:deploy`
+
+### 2 Configuring PostgreSQL
+#### On Heroku
+1. From the Heroku web dashboard, provision Heroku PostgreSQL (free Hobby Dev plan) to `heroku-expense-tracker-back` plan.
+2. In `application.properties`, inject the `DATABASE_URL` environment variable that is set by Heroku
+3. Define a Spring configuration that will be applied when `heroku` profile is enabled, to build a DataSource bean based on the DB URL set by Heroku
+4. Adapt `heroku-maven-plugin` configuration to have Heroku start the application using the `heroku` Spring profile
+#### Locally
+As I didn't want to install PostgreSQL locally I've decided to use a Dockerized version of it. 
+
+So, I've defined a `docker-composes.ymal` file in which a `postgres` container is defined as well as a volume to hold the DB data.
+
+### 3 Enabling Liquibase
+1. In `application.properties`, enabling Liquibase, specifying the driver class to use and specifying the path to the changelog file:
+```properties
+spring.liquibase.enabled=true
+spring.liquibase.driver-class-name=org.postgresql.Driver
+spring.liquibase.change-log=db/changelog/db.changelog-master.xml
+```
+2. Add maven dependencies:
+   - `spring-boot-starter-jdbc`, mainly to get necessary DataSource implementation classes and Connection Pool classes
+   - `postgresql` to get the PostgreSQL driver necessary to Liquibase
+   - 'liquibase-core'

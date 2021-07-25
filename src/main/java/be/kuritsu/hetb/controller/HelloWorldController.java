@@ -12,8 +12,11 @@ public class HelloWorldController {
     @Value("${server.port}")
     private Integer serverPort;
 
+    @Value("${db.url}")
+    private String dbURL;
+
     @GetMapping
     public String sayHello() {
-        return "Hello, it is " + LocalDateTime.now() + ", I'm listening to port: " + serverPort;
+        return "Hello, it is " + LocalDateTime.now() + ", I'm listening to port: " + serverPort + " - DB URL: " + dbURL;
     }
 }
