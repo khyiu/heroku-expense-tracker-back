@@ -17,7 +17,7 @@ public class DataSourceConfigHeroku {
 
     @Bean
     public DataSource getDataSource(@Value("${db.url}") String dbUrl, @Value("${db.driver}") String dbDriver) {
-        LOGGER.info("Current DB URL: " + dbUrl);
+        LOGGER.info("Current DB URL: {}", dbUrl);
 
         String [] tokens = dbUrl.split("//");
         String [] dbDataTokens = tokens[1].split("@");
