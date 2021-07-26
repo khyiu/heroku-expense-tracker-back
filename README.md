@@ -63,3 +63,5 @@ In SonarCloud, create a new project:
    - select CircleCI as analysis source
    - follow the instructions to create a CircleCI context + add the environment variables
    - select maven as being the build tool and follow the instructions to complete the Maven config + the CircleCI `config.yml` files
+
+### 6 Choosing an in-memory DB vendor for integration tests
