@@ -64,4 +64,18 @@ In SonarCloud, create a new project:
    - follow the instructions to create a CircleCI context + add the environment variables
    - select maven as being the build tool and follow the instructions to complete the Maven config + the CircleCI `config.yml` files
 
-### 6 Choosing an in-memory DB vendor for integration tests
+### 6 Authentication/authorization using OpenID Connect - Keycloak
+#### Setting up Keycloak
+   1. Sign up in [Cloud-IAM](https://www.cloud-iam.com/): Cloud IAM provides Keycloak servers as a service
+   2. Select the **Little Lemur** plan. This plan is free and offers 1 Keycloak realm with up to 100 users, which is more than enough for a personal project
+   3. In the realm settings, name the realm `kuritsu`  
+  
+![keycloak realm settings](./doc/keycloak_01.png)
+   4. In the "clients" section, create a new one and name it `expense-tracker`. This client will allow the current application to use Keycloak to handle authentication  
+
+![keycloak clients section](./doc/keycloak_02.png)
+
+   5. In the `expense-tracker` client details, in the the "settings" tab, set "access type" to `confidential`. That will provide an extra "Credentials" tab
+   6. in the "Credentials" tab, select `Client ID and secret` as "Client Authenticator". As of now, client ID and client secret must be provided in the request to retrieve an access token
+   7. In the "Roles" section, create a role named `expense-tracker-user`. Later, we'll inject this role as a granted authority in the Spring Security context during the OIDC authentication process.
+   8. In the "Users" section, create the users that'll be using this application
