@@ -79,3 +79,48 @@ In SonarCloud, create a new project:
    6. in the "Credentials" tab, select `Client ID and secret` as "Client Authenticator". As of now, client ID and client secret must be provided in the request to retrieve an access token
    7. In the "Roles" section, create a role named `expense-tracker-user`. Later, we'll inject this role as a granted authority in the Spring Security context during the OIDC authentication process.
    8. In the "Users" section, create the users that'll be using this application
+
+#### Integrate Keycloak with Spring Boot app
+##### Maven
+Add the following to the Maven configuration:
+``` XML
+...
+<dependencyManagement>
+     <dependencies>
+         <dependency>
+             <groupId>org.keycloak.bom</groupId>
+             <artifactId>keycloak-adapter-bom</artifactId>
+             <version>${keycloak.version}</version>
+             <type>pom</type>
+             <scope>import</scope>
+         </dependency>
+     </dependencies>
+ </dependencyManagement>
+...
+```
+
+And the following dependencies
+``` XML
+<dependencies>
+	<dependency>
+		<groupId>org.keycloak</groupId>
+		<artifactId>keycloak-spring-boot-starter</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-security</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+	</dependency>
+</dependencies>
+```
+
+##### Spring Boot configuration
+Add the following properties to `application.properties`
+
+``` Properties
+keycloak.auth-server-url=https://lemur-4.cloud-iam.com/auth
+keycloak.realm=kuritsu
+keycloak.resource=expense-tracker
