@@ -58,10 +58,9 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         super.configure(httpSecurity);
-        httpSecurity
-                .authorizeRequests()
-                .anyRequest()
-                .fullyAuthenticated();
+        httpSecurity.authorizeRequests()
+                .antMatchers("/actuator/**").permitAll()
+                .antMatchers("/**").fullyAuthenticated();
     }
 
     @Bean
