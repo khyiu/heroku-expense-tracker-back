@@ -124,3 +124,7 @@ Add the following properties to `application.properties`
 keycloak.auth-server-url=https://lemur-4.cloud-iam.com/auth
 keycloak.realm=kuritsu
 keycloak.resource=expense-tracker
+```
+
+### 7 Using Jitpack to include Github repo as a Maven dependency
+Here's the [doc](https://jitpack.io/docs/) to use Jitpack, it's pretty straightforward

@@ -13,6 +13,13 @@
 	<name>heroku-expense-tracker-back</name>
 	<description>Hobby project to explore Heroku</description>
 
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
 	<properties>
 		<java.version>13</java.version>
 		<maven.compiler.source>13</maven.compiler.source>
@@ -23,6 +30,8 @@
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
 		<keycloak.version>13.0.0</keycloak.version>
+
+		<api.version>09167a09b3861b80a0fea5f1028e11f43b59f5db</api.version>
 	</properties>
 
 	<dependencyManagement>
@@ -76,6 +85,13 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+		</dependency>
+
+		<!-- API -->
+		<dependency>
+			<groupId>com.github.khyiu</groupId>
+			<artifactId>heroku-expense-tracker-api</artifactId>
+			<version>${api.version}</version>
 		</dependency>
 
 		<!-- test dependencies -->
