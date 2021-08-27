@@ -25,6 +25,9 @@ jobs:
       - run:
           name: Test
           command: mvn test
+      - run:
+          name: Heroku deployment
+          command: mvn heroku:deploy
 
 workflows:
   # Below is the definition of your workflow.
