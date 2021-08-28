@@ -128,3 +128,18 @@ keycloak.resource=expense-tracker
 
 ### 7 Using Jitpack to include Github repo as a Maven dependency
 Here's the [doc](https://jitpack.io/docs/) to use Jitpack, it's pretty straightforward
+
+### 8 Add Heroku deployment to CircleCI config.
+To deploy an application, Heroku Maven plugin needs to authenticate to Heroku server. On an environment in which Heroku CLI is installed, the Maven plugin automatically picks
+up the necessary credentials from Heroku CLI. On the other hand, if Heroku CLI isn't installed, we have to pass the Heroku API key as a parameter to the plugin.
+
+In CircleCI `config.yml`, add the following command:
+``` YML
+  - run:
+          name: Heroku deployment
+          command: HEROKU_API_KEY="${HEROKU_API_KEY}" mvn heroku:deploy
+```
+
+The Heroku API key can be found in your Heroku account settings page.
+
+Finally, copy the value of the Heroku API key and create an environment variable named `HEROKU_API_KEY` in the CircleCI project settings to store it.
