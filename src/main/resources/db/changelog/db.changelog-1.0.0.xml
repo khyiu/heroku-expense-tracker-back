@@ -9,4 +9,9 @@
 			create schema hetb;
 		</sql>
 	</changeSet>
+	<changeSet id="rename_schema" author="kyiu">
+		<sql>
+			alter schema hetb rename to het;
+		</sql>
+	</changeSet>
 </databaseChangeLog>
