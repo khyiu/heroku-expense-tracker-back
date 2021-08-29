@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+	<changeSet id="create_expense_table" author="kyiu">
+		<createTable schemaName="het" tableName="expense">
+			<column name="id" type="uuid">
+				<constraints primaryKey="true" primaryKeyName="expense_pk"/>
+			</column>
+			<column name="owner" type="varchar(128)">
+				<constraints nullable="false" notNullConstraintName="expense_owner_not_null"/>
+			</column>
+			<column name="version" type="int">
+				<constraints nullable="false" notNullConstraintName="expense_version_not_null"/>
+			</column>
+			<column name="date" type="date">
+				<constraints nullable="false" notNullConstraintName="expense_date_not_null"/>
+			</column>
+			<column name="amount" type="decimal(9, 2)">
+				<constraints nullable="false" notNullConstraintName="expense_amount_not_null"/>
+			</column>
+			<column name="description" type="varchar(1024)"></column>
+			<column name="paid_with_credit_card" type="boolean"></column>
+			<column name="creditCardStatementIssued" type="boolean"></column>
+		</createTable>
+
+		<createTable schemaName="het" tableName="expense_tag">
+			<column name="expense_id" type="uuid">
+				<constraints nullable="false" notNullConstraintName="expense_tag_expense_id_not_null"/>
+			</column>
+			<column name="value" type="varchar(50)">
+				<constraints nullable="false" notNullConstraintName="expense_tag_value_not_null"/>
+			</column>
+		</createTable>
+
+		<addForeignKeyConstraint baseTableSchemaName="het"
+								 baseTableName="expense_tag"
+								 baseColumnNames="expense_id"
+								 referencedTableSchemaName="het"
+								 referencedTableName="expense"
+								 referencedColumnNames="id"
+								 constraintName="expense_tag_expense_fk"/>
+	</changeSet>
+</databaseChangeLog>
