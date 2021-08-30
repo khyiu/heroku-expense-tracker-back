@@ -60,8 +60,15 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         super.configure(httpSecurity);
         httpSecurity.authorizeRequests()
                 .antMatchers("/actuator/**").permitAll()
-                .antMatchers("/**").fullyAuthenticated();
-    }
+                .antMatchers("/**").fullyAuthenticated()
+                /*
+                 By default Spring security enables CSRF. As a consequence, a CSRF token need to be provided
+                 in PUT/POST/DELETE requests. If the token is missing or invalid, the request results in HTTP 403 error.
+                 Let's disable CSRF for the moment. We'll check later if it's worth switching it back on.
+                 */
+                .and()
+                .csrf().disable();
+}
 
     @Bean
     public KeycloakSpringBootConfigResolver keycloakSpringBootConfigResolver() {
