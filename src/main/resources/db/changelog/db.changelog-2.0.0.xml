@@ -43,4 +43,23 @@
 								 referencedColumnNames="id"
 								 constraintName="expense_tag_expense_fk"/>
 	</changeSet>
+
+	<changeSet id="rename_column_expense_table" author="kyiu">
+		<renameColumn schemaName="het" tableName="expense" oldColumnName="paid_with_credit_card" newColumnName="paidWithCreditCard"/>
+	</changeSet>
+
+	<changeSet id="rename_expense_table_columns" author="kyiu">
+		<comment>The purpose of this changeset is to have all column names comply with the default Physical naming strategy</comment>
+		<renameColumn schemaName="het" tableName="expense" oldColumnName="paidWithCreditCard" newColumnName="paid_with_credit_card"/>
+		<renameColumn schemaName="het" tableName="expense" oldColumnName="creditCardStatementIssued" newColumnName="credit_card_statement_issued"/>
+	</changeSet>
+	
+	<changeSet id="add_expense_order_column" author="kyiu">
+		<addColumn schemaName="het" tableName="expense">
+			<column name="order" type="timestamp">
+				<constraints nullable="false" notNullConstraintName="expense_order_not_null"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
 </databaseChangeLog>
