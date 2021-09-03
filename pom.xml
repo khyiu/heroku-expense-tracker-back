@@ -31,7 +31,7 @@
 
 		<keycloak.version>13.0.0</keycloak.version>
 
-		<api.version>09167a09b3861b80a0fea5f1028e11f43b59f5db</api.version>
+		<api.version>5b17a14e088cd4675dd9bcd8050d633daeca24dd</api.version>
 	</properties>
 
 	<dependencyManagement>
