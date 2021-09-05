@@ -8,13 +8,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.kuritsu.het.api.ExpenseApi;
 import be.kuritsu.het.api.ExpensesApi;
 import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.het.model.ExpenseResponse;
 import be.kuritsu.hetb.service.ExpenseService;
 
 @RestController
-public class ExpensesController implements ExpensesApi {
+public class ExpensesController implements ExpensesApi, ExpenseApi {
 
     private final ExpenseService expenseService;
 

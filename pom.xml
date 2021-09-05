@@ -31,7 +31,7 @@
 
 		<keycloak.version>13.0.0</keycloak.version>
 
-		<api.version>5b17a14e088cd4675dd9bcd8050d633daeca24dd</api.version>
+		<api.version>e20f5ebd9cb0821fff6b0e688d91360dca7b9b09</api.version>
 	</properties>
 
 	<dependencyManagement>
@@ -132,9 +132,20 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<version>1.4.200</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.7.2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
