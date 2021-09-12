@@ -143,3 +143,72 @@ In CircleCI `config.yml`, add the following command:
 The Heroku API key can be found in your Heroku account settings page.
 
 Finally, copy the value of the Heroku API key and create an environment variable named `HEROKU_API_KEY` in the CircleCI project settings to store it.
+
+### 9 Configuration for integration tests + Cucumber (BDD) integration
+#### 9.1 Having Maven pick up the integration test classes
+Normally, by default, `maven-failsafe-plugin` picks up `*IT.java` classes as integration test classes. But for some reason, it didn't work out of the box.
+I couldn't pinpoint the cause, but I suspect it has to do with the plugin version (`spring-boot-starter-parent [2.5.2]` imports `maven-failsafe-plugin [2.22.2]`and the fact 
+that I'm using JUnit 4 to run tests.  
+
+Eventually, I got Maven picking my integration test classes with the following config:
+
+```XML
+<plugin>
+   <groupId>org.apache.maven.plugins</groupId>
+   <artifactId>maven-failsafe-plugin</artifactId>
+   <dependencies>
+      <dependency>
+         <groupId>org.apache.maven.surefire</groupId>
+         <artifactId>surefire-junit4</artifactId>
+         <version>2.22.2</version>
+      </dependency>
+   </dependencies>
+   <executions>
+      <execution>
+         <goals>
+            <goal>integration-test</goal>
+            <goal>verify</goal>
+         </goals>
+      </execution>
+   </executions>
+</plugin>
+```
+#### 9.2 Integrating Cucumber for BDD-based integration tests
+1. Add necessary dependencies  
+ 
+```XML
+<dependency>
+   <groupId>io.cucumber</groupId>
+   <artifactId>cucumber-java</artifactId>
+   <version>${cucumber.version}</version>
+</dependency>
+<dependency>
+    <groupId>io.cucumber</groupId>
+    <artifactId>cucumber-junit</artifactId>
+    <version>${cucumber.version}</version>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>io.cucumber</groupId>
+    <artifactId>cucumber-spring</artifactId>
+    <version>${cucumber.version}</version>
+    <scope>test</scope>
+</dependency>
+ ```
+
+2. Place Gherkin feature files in `src/test/resources/cucumber-features`
+3. Create an integration test class to bootstrap the Cucumber tests as follows.  
+   * the `features` attribute sets the location to the feature files
+   * the `glue` attributes defines the packages where step definitions (= Java code mapped to Cucumber step) are located
+
+```Java
+@RunWith(Cucumber.class)
+@CucumberOptions(
+        plugin = { "pretty", "html:target/cucumber.html" },
+        features = { "src/test/resources/cucumber-features" },
+        glue = { "be.kuritsu.bdd" }
+)
+public class CucumberIT {
+}
+```
+   
