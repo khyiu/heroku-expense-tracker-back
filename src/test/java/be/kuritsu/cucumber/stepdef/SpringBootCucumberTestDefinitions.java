@@ -1,6 +1,7 @@
 package be.kuritsu.cucumber.stepdef;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -29,6 +30,11 @@ public class SpringBootCucumberTestDefinitions extends CucumberStepDefinitions {
     @Given("a non authenticated user")
     public void given_non_authenticated_user() {
         currentUserRequestPostProcessor = null;
+    }
+
+    @Given("an authenticated user, {string}, with role {string}")
+    public void an_authenticated_user_bob_with_role_expense_tracker_test_user(String username, String role) {
+        this.currentUserRequestPostProcessor = user(username).roles(role);
     }
 
     @When("he sends a request to register any expense")
