@@ -4,6 +4,11 @@ This is a personal project to explore usage of Heroku. I've previously created a
 to explore AWS features but after the free-tier period expired, I figured the cost of simply letting 
 the deployed application idle were quite high. Hence, the switch to Heroku with a free hobby plan.
 
+## Status
+[![CircleCI](https://circleci.com/gh/khyiu/heroku-expense-tracker-back.svg?style=shield)](https://app.circleci.com/pipelines/github/khyiu/heroku-expense-tracker-back)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=khyiu_heroku-expense-tracker-back&metric=alert_status)](https://sonarcloud.io/dashboard?id=khyiu_heroku-expense-tracker-back)
+
 ## Journey logs
 ### 1 Deploying Spring Boot application to Heroku
 As deployment would likely be part of a CI/CD process, I've chosen to handle deployment to Heroku using `heroku-maven-plugin`.
