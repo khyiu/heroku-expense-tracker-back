@@ -322,7 +322,7 @@
 						</goals>
 						<configuration>
 							<formats>XML</formats>
-							<outputDirectory>${project.build.directory}/reports/jacoco-it</outputDirectory>
+<!--							<outputDirectory>${project.build.directory}/reports/jacoco-it</outputDirectory>-->
 						</configuration>
 					</execution>
 				</executions>
