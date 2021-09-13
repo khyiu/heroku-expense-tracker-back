@@ -16,17 +16,13 @@ jobs:
       - checkout
       # Use mvn clean and package as the standard maven build phase
       - run:
-          name: Build
-          command: mvn -DskipTests clean package
+          name: Build and tests (unit + integration)
+          command: mvn clean verify
       - run:
           name: Code analysis on SonarCloud
-          command: mvn -DskipTests verify sonar:sonar
-      # Then run your tests!
+          command: mvn -DskipTests sonar:sonar
       - run:
-          name: Test
-          command: mvn test
-      - run:
-          name: Heroku deployment
+          name: Deploy to Heroku
           command: HEROKU_API_KEY="${HEROKU_API_KEY}" mvn heroku:deploy
 
 workflows:
