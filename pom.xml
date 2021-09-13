@@ -28,6 +28,7 @@
 		<sonar.projectKey>khyiu_heroku-expense-tracker-back</sonar.projectKey>
 		<sonar.organization>khyiu</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		<sonar.coverage.jacoco.xmlReportPaths>${build.directory}/jacoco-it.exec</sonar.coverage.jacoco.xmlReportPaths>
 
 		<keycloak.version>13.0.0</keycloak.version>
 
