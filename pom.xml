@@ -28,7 +28,6 @@
 		<sonar.projectKey>khyiu_heroku-expense-tracker-back</sonar.projectKey>
 		<sonar.organization>khyiu</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-<!--		<sonar.coverage.jacoco.xmlReportPaths>**/reports/jacoco-it/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
 
 		<keycloak.version>13.0.0</keycloak.version>
 
@@ -286,6 +285,17 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.surefire</groupId>
+						<artifactId>surefire-junit4</artifactId>
+						<version>2.22.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<dependencies>
 					<dependency>
@@ -309,6 +319,22 @@
 				<version>0.8.7</version>
 				<executions>
 					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report-unit</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<formats>XML</formats>
+						</configuration>
+					</execution>
+					<execution>
 						<id>prepare-agent-integration</id>
 						<goals>
 							<goal>prepare-agent-integration</goal>
@@ -322,7 +348,6 @@
 						</goals>
 						<configuration>
 							<formats>XML</formats>
-<!--							<outputDirectory>${project.build.directory}/reports/jacoco-it</outputDirectory>-->
 						</configuration>
 					</execution>
 				</executions>
