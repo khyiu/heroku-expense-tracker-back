@@ -58,6 +58,23 @@ public class ExpenseRequestFactory {
         return expenseRequest;
     }
 
+    public static ExpenseRequest getExpenseRequest(LocalDate date,
+            BigDecimal amount,
+            List<String> tags,
+            String description,
+            boolean paidWithCreditCard,
+            boolean creditCardStatementIssued) {
+        ExpenseRequest expenseRequest = new ExpenseRequest();
+        expenseRequest.setDate(date);
+        expenseRequest.setAmount(amount);
+        expenseRequest.setTags(tags);
+        expenseRequest.setDescription(description);
+        expenseRequest.setPaidWithCreditCard(paidWithCreditCard);
+        expenseRequest.setCreditCardStatementIssued(creditCardStatementIssued);
+
+        return expenseRequest;
+    }
+
     private static LocalDate getRandomDateBetween(LocalDate startInclusive, LocalDate endExclusive) {
         long startEpochDay = startInclusive.toEpochDay();
         long endEpochDay = endExclusive.toEpochDay();

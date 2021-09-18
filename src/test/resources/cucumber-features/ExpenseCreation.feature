@@ -25,3 +25,12 @@ Feature: Expense registration
       | 14/12/2014 | -78.00   | null      | 1000                    |
       | 14/12/2014 | -78.00   | ;         | 1024                    |
       | 14/12/2014 | -78.00   | tag1      | 1025                    |
+
+  Scenario Outline: an authenticated user with sufficient permission registers a valid expense
+    Given an authenticated user, "John", with role "EXPENSE-TRACKER-USER"
+    When he sends a request to register an expense with <date>, <amount>, <tags>, <description>, <paidWithCreditCard> and <creditCardStatementIssued>
+    Then he gets a response with status 201
+    And he receives the persisted expense with <date>, <amount>, <tags>, <description>, <paidWithCreditCard> and <creditCardStatementIssued>
+    Examples:
+      | date       | amount | tags      | description        | paidWithCreditCard | creditCardStatementIssued |
+      | 02/01/2021 | 15.00  | transport | "Tickets STIB 10x" | true               | false                     |
