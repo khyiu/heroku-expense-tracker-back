@@ -1,10 +1,10 @@
 package be.kuritsu.testutil;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -36,6 +36,25 @@ public class ExpenseRequestFactory {
         }
 
         expenseRequest.setTags(Collections.singletonList(getRandomString(1, 50)));
+        return expenseRequest;
+    }
+
+    public static ExpenseRequest getExpenseRequest(LocalDate date, BigDecimal amount, List<String> tags, int lengthOfRandomDescription) {
+        ExpenseRequest expenseRequest = new ExpenseRequest();
+        expenseRequest.setDate(date);
+        expenseRequest.setAmount(amount);
+        expenseRequest.setTags(tags);
+        expenseRequest.setDescription(lengthOfRandomDescription == 0 ?
+                null :
+                RandomStringUtils.random(lengthOfRandomDescription));
+
+        boolean paidWithCreditCard = ThreadLocalRandom.current().nextBoolean();
+        expenseRequest.setPaidWithCreditCard(paidWithCreditCard);
+
+        if (paidWithCreditCard) {
+            expenseRequest.setCreditCardStatementIssued(ThreadLocalRandom.current().nextBoolean());
+        }
+
         return expenseRequest;
     }
 

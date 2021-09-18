@@ -5,6 +5,11 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -12,7 +17,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.testutil.ExpenseRequestFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import io.cucumber.java.Before;
+import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -46,6 +54,22 @@ public class SpringBootCucumberTestDefinitions extends CucumberStepDefinitions {
         }
 
         ExpenseRequest expenseRequest = ExpenseRequestFactory.getRandomValidExpenseRequest();
+        requestBuilder.contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(expenseRequest));
+
+        currentMvcResult = mockMvc.perform(requestBuilder)
+                .andReturn();
+    }
+
+    @When("he sends a request to register an expense with {nullableDate}, {nullableAmount}, {nullableTags} and {int}")
+    public void register_a_parameterized_expense(LocalDate date, BigDecimal amount, List<String> tags, int randomDescriptionLength) throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = post("/expenses");
+
+        if (currentUserRequestPostProcessor != null) {
+            requestBuilder.with(currentUserRequestPostProcessor);
+        }
+
+        ExpenseRequest expenseRequest = ExpenseRequestFactory.getExpenseRequest(date, amount, tags, randomDescriptionLength);
         requestBuilder.contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(expenseRequest));
 

@@ -7,7 +7,7 @@ import io.cucumber.junit.CucumberOptions;
 @CucumberOptions(
         plugin = { "pretty", "html:target/cucumber.html" },
         features = { "src/test/resources/cucumber-features" },
-        glue = { "be.kuritsu.cucumber.stepdef" }
+        glue = { "be.kuritsu.cucumber" }
 )
 public class CucumberIT {
 }
