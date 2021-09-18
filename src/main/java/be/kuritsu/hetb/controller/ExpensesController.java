@@ -3,6 +3,7 @@ package be.kuritsu.hetb.controller;
 import static be.kuritsu.hetb.config.SecurityConfig.ROLE_EXPENSE_TRACKER_USER;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,8 +27,8 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
     @Secured(ROLE_EXPENSE_TRACKER_USER)
     @Override
     public ResponseEntity<ExpenseResponse> registerExpense(ExpenseRequest expenseRequest) {
-        // todo kyiu: implement
-        return null;
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(expenseService.registerExpense(expenseRequest));
     }
 
     @Secured(ROLE_EXPENSE_TRACKER_USER)

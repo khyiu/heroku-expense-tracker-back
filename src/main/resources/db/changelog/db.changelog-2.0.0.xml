@@ -62,4 +62,8 @@
 		</addColumn>
 	</changeSet>
 
+	<changeSet id="add_expense_order_unique_constraint" author="kyiu">
+		<addUniqueConstraint schemaName="het" tableName="expense" columnNames="date, order" constraintName="expense_date_order_unique"/>
+	</changeSet>
+
 </databaseChangeLog>
