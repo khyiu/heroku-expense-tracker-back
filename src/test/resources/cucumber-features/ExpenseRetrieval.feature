@@ -11,3 +11,8 @@ Feature: Expense retrieval
     Given an authenticated user, "Bob", with role "EXPENSE-TRACKER-TEST-USER"
     When he sends a request to retrieve any expense
     Then he gets a response with status 403
+    
+  Scenario: an authenticated user with sufficient permission retrieves a non existing expense
+    Given an authenticated user, "John", with role "EXPENSE-TRACKER-USER"
+    When he sends a request to retrieve any expense
+    Then he gets a response with status 404
