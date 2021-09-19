@@ -1,11 +1,13 @@
 package be.kuritsu.cucumber.stepdef;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -91,6 +93,19 @@ public class CucumberWhens extends CucumberStepDefinitions{
 
         requestBuilder.contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(expenseRequest));
+
+        state.setCurrentMvcResult(state.getMockMvc()
+                .perform(requestBuilder)
+                .andReturn());
+    }
+
+    @When("he sends a request to retrieve any expense")
+    public void retrieves_any_expense() throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = get("/expenses/{expenseId}", UUID.randomUUID());
+
+        if (state.getCurrentUserRequestPostProcessor() != null) {
+            requestBuilder.with(state.getCurrentUserRequestPostProcessor());
+        }
 
         state.setCurrentMvcResult(state.getMockMvc()
                 .perform(requestBuilder)
