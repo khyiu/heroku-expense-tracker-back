@@ -1,4 +1,4 @@
-package be.kuritsu.cucumber.stepdef;
+package be.kuritsu.cucumber;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

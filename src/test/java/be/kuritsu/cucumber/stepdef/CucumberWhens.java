@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import be.kuritsu.cucumber.CucumberState;
 import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.testutil.ExpenseRequestFactory;
 

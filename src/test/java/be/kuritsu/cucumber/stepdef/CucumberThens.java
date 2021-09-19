@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import be.kuritsu.cucumber.CucumberState;
 import be.kuritsu.het.model.ExpenseResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

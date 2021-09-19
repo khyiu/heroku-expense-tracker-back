@@ -1,4 +1,4 @@
-package be.kuritsu.cucumber.stepdef;
+package be.kuritsu.cucumber;
 
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;

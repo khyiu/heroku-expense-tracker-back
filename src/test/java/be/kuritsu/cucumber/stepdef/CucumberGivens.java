@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import be.kuritsu.cucumber.CucumberState;
+
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 
