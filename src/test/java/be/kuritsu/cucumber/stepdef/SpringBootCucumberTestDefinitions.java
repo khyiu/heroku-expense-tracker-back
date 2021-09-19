@@ -19,7 +19,6 @@ import be.kuritsu.het.model.ExpenseResponse;
 import be.kuritsu.testutil.ExpenseRequestFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
