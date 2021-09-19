@@ -101,7 +101,7 @@ public class CucumberWhens extends CucumberStepDefinitions{
 
     @When("he sends a request to retrieve any expense")
     public void retrieves_any_expense() throws Exception {
-        MockHttpServletRequestBuilder requestBuilder = get("/expenses/{expenseId}", UUID.randomUUID());
+        MockHttpServletRequestBuilder requestBuilder = get("/expense/{expenseId}", UUID.randomUUID());
 
         if (state.getCurrentUserRequestPostProcessor() != null) {
             requestBuilder.with(state.getCurrentUserRequestPostProcessor());
