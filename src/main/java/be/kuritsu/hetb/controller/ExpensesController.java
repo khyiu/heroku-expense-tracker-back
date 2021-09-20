@@ -2,6 +2,8 @@ package be.kuritsu.hetb.controller;
 
 import static be.kuritsu.hetb.config.SecurityConfig.ROLE_EXPENSE_TRACKER_USER;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +36,6 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
     @Secured(ROLE_EXPENSE_TRACKER_USER)
     @Override
     public ResponseEntity<ExpenseResponse> getExpense(String id) {
-        // todo kyiu: implement
-        return null;
+        return ResponseEntity.ok(expenseService.getExpense(UUID.fromString(id)));
     }
 }

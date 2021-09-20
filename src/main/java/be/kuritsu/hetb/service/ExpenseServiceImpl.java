@@ -3,6 +3,7 @@ package be.kuritsu.hetb.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.UUID;
 
 import javax.transaction.Transactional;
 
@@ -38,6 +39,12 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setOwner(owner);
         expense.setOrder(computeExpenseOrder(owner, expense.getDate()));
         expenseRepository.save(expense);
+        return expenseMapper.expenseToExpenseResponse(expense);
+    }
+
+    @Override
+    public ExpenseResponse getExpense(UUID expenseId) {
+        Expense expense = expenseRepository.getById(expenseId);
         return expenseMapper.expenseToExpenseResponse(expense);
     }
 
