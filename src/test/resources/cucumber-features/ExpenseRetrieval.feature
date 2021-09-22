@@ -16,3 +16,10 @@ Feature: Expense retrieval
     Given an authenticated user, "John", with role "EXPENSE-TRACKER-USER"
     When he sends a request to retrieve any expense
     Then he gets a response with status 404
+
+  Scenario: an authenticated user with sufficient permission retrieves an expense that belongs to another user
+    Given an authenticated user, "John", with role "EXPENSE-TRACKER-USER"
+    Given he sends a request to register any expense
+    Given an authenticated user, "Dwight", with role "EXPENSE-TRACKER-USER"
+    When he sends a request to retrieve the last expense created by "John"
+    Then he gets a response with status 403

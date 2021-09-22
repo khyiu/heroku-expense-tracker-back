@@ -39,6 +39,7 @@ public class CucumberGivens extends CucumberStepDefinitions {
 
     @Given("an authenticated user, {string}, with role {string}")
     public void an_authenticated_user_bob_with_role_expense_tracker_test_user(String username, String role) {
+        state.setCurrentUsername(username);
         state.setCurrentUserRequestPostProcessor(user(username).roles(role));
     }
 }

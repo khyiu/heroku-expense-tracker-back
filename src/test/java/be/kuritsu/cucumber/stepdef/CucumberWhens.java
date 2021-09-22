@@ -4,6 +4,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -12,17 +13,21 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import be.kuritsu.cucumber.CucumberState;
 import be.kuritsu.het.model.ExpenseRequest;
+import be.kuritsu.het.model.ExpenseResponse;
 import be.kuritsu.testutil.ExpenseRequestFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.When;
 
-public class CucumberWhens extends CucumberStepDefinitions{
+public class CucumberWhens extends CucumberStepDefinitions {
 
     private final CucumberState state;
 
@@ -102,6 +107,23 @@ public class CucumberWhens extends CucumberStepDefinitions{
     @When("he sends a request to retrieve any expense")
     public void retrieves_any_expense() throws Exception {
         MockHttpServletRequestBuilder requestBuilder = get("/expense/{expenseId}", UUID.randomUUID());
+
+        if (state.getCurrentUserRequestPostProcessor() != null) {
+            requestBuilder.with(state.getCurrentUserRequestPostProcessor());
+        }
+
+        state.setCurrentMvcResult(state.getMockMvc()
+                .perform(requestBuilder)
+                .andReturn());
+    }
+
+    @When("he sends a request to retrieve the last expense created by {string}")
+    public void heSendsARequestToRetrieveTheLastExpenseCreatedBy(String username) throws Exception {
+        MvcResult lastMvcResult = state.getCurrentUserResults().get(username);
+        ExpenseResponse lastExpenseResponse = objectMapper.readValue(lastMvcResult.getResponse().getContentAsString(), ExpenseResponse.class);
+        String expenseId = lastExpenseResponse.getId();
+
+        MockHttpServletRequestBuilder requestBuilder = get("/expense/{expenseId}", expenseId);
 
         if (state.getCurrentUserRequestPostProcessor() != null) {
             requestBuilder.with(state.getCurrentUserRequestPostProcessor());
