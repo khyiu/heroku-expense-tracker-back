@@ -7,9 +7,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import be.kuritsu.hetb.domain.Expense;
+import be.kuritsu.hetb.security.SecuritySubject;
 
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, UUID> {
+
+    @SecuritySubject
+    @Override
+    Expense getById(UUID uuid);
 
     long countByOwnerAndDate(String owner, LocalDate date);
 }
