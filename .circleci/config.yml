@@ -11,6 +11,7 @@ jobs:
     # A list of available CircleCI Docker Convenience Images are available here: https://circleci.com/developer/images/image/cimg/openjdk
     docker:
       - image: cimg/openjdk:13.0
+    working_directory: ~/build-workdir
     steps:
       # Checkout the code as the first step.
       - checkout
