@@ -23,3 +23,16 @@ Feature: Expense retrieval
     Given an authenticated user, "Dwight", with role "EXPENSE-TRACKER-USER"
     When he sends a request to retrieve the last expense created by "John"
     Then he gets a response with status 403
+
+  Scenario Outline: an authenticated user with sufficient permission retrieves his own expense
+    Given an authenticated user, "John", with role "EXPENSE-TRACKER-USER"
+    When he sends a request to register an expense with <date>, <amount>, <tags>, <description>, <paidWithCreditCard> and <creditCardStatementIssued>
+    And he sends a request to retrieve the last expense created by "John"
+    Then he gets a response with status 200
+    And he receives the persisted expense with <date>, <amount>, <tags>, <description>, <paidWithCreditCard> and <creditCardStatementIssued>
+    Examples:
+      | date       | amount | tags            | description                    | paidWithCreditCard | creditCardStatementIssued |
+      | 02/01/2021 | -15.00 | transport       | "Tickets STIB 10x"             | true               | false                     |
+      | 02/01/2021 | -10.00 | bouffe          | "Glace"                        | false              | false                     |
+      | 07/02/2021 | -3.50  | frais_bancaires | "Frais bancaires compte a vue" | false              | false                     |
+      | 07/02/2021 | 50000  | lotto           | "Gains lotto"                  | false              | false                     |
