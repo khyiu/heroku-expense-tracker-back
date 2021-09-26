@@ -38,4 +38,9 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
     public ResponseEntity<ExpenseResponse> getExpense(String id) {
         return ResponseEntity.ok(expenseService.getExpense(UUID.fromString(id)));
     }
+
+    @Override
+    public ResponseEntity<ExpenseResponse> updateExpense(String id, ExpenseRequest expenseRequest) {
+        return null;
+    }
 }

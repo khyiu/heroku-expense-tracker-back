@@ -1,8 +1,7 @@
 package be.kuritsu.cucumber.stepdef;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -50,6 +49,23 @@ public class CucumberWhens extends CucumberStepDefinitions {
     @When("he sends a request to register any expense")
     public void register_any_expense() throws Exception {
         MockHttpServletRequestBuilder requestBuilder = post("/expenses");
+
+        if (state.getCurrentUserRequestPostProcessor() != null) {
+            requestBuilder.with(state.getCurrentUserRequestPostProcessor());
+        }
+
+        ExpenseRequest expenseRequest = ExpenseRequestFactory.getRandomValidExpenseRequest();
+        requestBuilder.contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(expenseRequest));
+
+        state.setCurrentMvcResult(state.getMockMvc()
+                .perform(requestBuilder)
+                .andReturn());
+    }
+
+    @When("he sends a request to edit something in the expense with id={string}")
+    public void edit_expense(String expenseId) throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = put("/expense/{expenseId}", expenseId);
 
         if (state.getCurrentUserRequestPostProcessor() != null) {
             requestBuilder.with(state.getCurrentUserRequestPostProcessor());
@@ -118,7 +134,7 @@ public class CucumberWhens extends CucumberStepDefinitions {
     }
 
     @When("he sends a request to retrieve the last expense created by {string}")
-    public void heSendsARequestToRetrieveTheLastExpenseCreatedBy(String username) throws Exception {
+    public void retrieve_last_expense_created_by(String username) throws Exception {
         MvcResult lastMvcResult = state.getCurrentUserResults().get(username);
         ExpenseResponse lastExpenseResponse = objectMapper.readValue(lastMvcResult.getResponse().getContentAsString(), ExpenseResponse.class);
         String expenseId = lastExpenseResponse.getId();
@@ -128,6 +144,39 @@ public class CucumberWhens extends CucumberStepDefinitions {
         if (state.getCurrentUserRequestPostProcessor() != null) {
             requestBuilder.with(state.getCurrentUserRequestPostProcessor());
         }
+
+        state.setCurrentMvcResult(state.getMockMvc()
+                .perform(requestBuilder)
+                .andReturn());
+    }
+
+    @When("he sends a request to edit the last expense created by {string} with {nullableDate}, {nullableAmount}, {nullableTags}, {string}, {} and {}")
+    public void register_a_parameterized_expense(String username,
+            LocalDate date,
+            BigDecimal amount,
+            List<String> tags,
+            String description,
+            Boolean paidWithCreditCard,
+            Boolean creditCardStatementIssued) throws Exception {
+        ExpenseRequest expenseRequest = ExpenseRequestFactory.getExpenseRequest(date, amount, tags, description, paidWithCreditCard, creditCardStatementIssued);
+        ExpenseResponse expenseResponse = objectMapper.readValue(state.getCurrentUserResults().get(username).getResponse().getContentAsString(), ExpenseResponse.class);
+        MockHttpServletRequestBuilder requestBuilder = put("/expense/{expenseId}", expenseResponse.getId());
+
+        if (state.getCurrentUserRequestPostProcessor() != null) {
+            requestBuilder.with(state.getCurrentUserRequestPostProcessor());
+        }
+
+        ExpenseRequest expenseRequestUpdate = new ExpenseRequest()
+                .version(expenseResponse.getVersion())
+                .date(date)
+                .amount(amount)
+                .tags(tags)
+                .description(description)
+                .paidWithCreditCard(paidWithCreditCard)
+                .creditCardStatementIssued(creditCardStatementIssued);
+
+        requestBuilder.contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(expenseRequestUpdate));
 
         state.setCurrentMvcResult(state.getMockMvc()
                 .perform(requestBuilder)
