@@ -10,4 +10,6 @@ public interface ExpenseService {
     ExpenseResponse registerExpense(ExpenseRequest expenseRequest);
 
     ExpenseResponse getExpense(UUID expenseId);
+
+    ExpenseResponse updateExpense(UUID expenseId, ExpenseRequest expenseRequest);
 }

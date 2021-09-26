@@ -39,8 +39,9 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
         return ResponseEntity.ok(expenseService.getExpense(UUID.fromString(id)));
     }
 
+    @Secured(ROLE_EXPENSE_TRACKER_USER)
     @Override
     public ResponseEntity<ExpenseResponse> updateExpense(String id, ExpenseRequest expenseRequest) {
-        return null;
+        return ResponseEntity.ok(expenseService.updateExpense(UUID.fromString(id), expenseRequest));
     }
 }

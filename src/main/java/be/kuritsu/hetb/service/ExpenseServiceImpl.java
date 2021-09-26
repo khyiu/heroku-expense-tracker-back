@@ -3,6 +3,7 @@ package be.kuritsu.hetb.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
@@ -53,4 +54,21 @@ public class ExpenseServiceImpl implements ExpenseService {
         return LocalDateTime.of(date, LocalTime.ofSecondOfDay(count + DEFAULT_ORDER_CREATION_OFFSET));
     }
 
+    @Override
+    public ExpenseResponse updateExpense(UUID expenseId, ExpenseRequest expenseRequest) {
+        Expense existingExpense = expenseRepository.getById(expenseId);
+
+        if (!existingExpense.getDate().equals(expenseRequest.getDate())) {
+            String owner = SecurityContextHolder.getContext().getAuthentication().getName();
+            existingExpense.setOrder(computeExpenseOrder(owner, expenseRequest.getDate()));
+        }
+
+        existingExpense.setDate(expenseRequest.getDate());
+        existingExpense.setAmount(expenseRequest.getAmount());
+        existingExpense.setTags(new HashSet<>(expenseRequest.getTags()));
+        existingExpense.setDescription(expenseRequest.getDescription());
+        existingExpense.setPaidWithCreditCard(expenseRequest.getPaidWithCreditCard());
+        existingExpense.setCreditCardStatementIssued(expenseRequest.getCreditCardStatementIssued());
+        return expenseMapper.expenseToExpenseResponse(existingExpense);
+    }
 }
