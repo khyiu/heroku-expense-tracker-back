@@ -66,4 +66,9 @@
 		<addUniqueConstraint schemaName="het" tableName="expense" columnNames="date, order" constraintName="expense_date_order_unique"/>
 	</changeSet>
 
+	<changeSet id="fix_expense_order_unique_constraint" author="kyiu">
+		<dropUniqueConstraint schemaName="het" tableName="expense" constraintName="expense_date_order_unique"/>
+		<addUniqueConstraint schemaName="het" tableName="expense" columnNames="date, order, owner" constraintName="expense_date_order_unique"/>
+	</changeSet>
+
 </databaseChangeLog>
