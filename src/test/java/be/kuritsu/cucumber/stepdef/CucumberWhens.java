@@ -3,7 +3,6 @@ package be.kuritsu.cucumber.stepdef;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -20,8 +19,6 @@ import be.kuritsu.cucumber.CucumberState;
 import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.het.model.ExpenseResponse;
 import be.kuritsu.testutil.ExpenseRequestFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.When;
@@ -74,6 +71,33 @@ public class CucumberWhens extends CucumberStepDefinitions {
         ExpenseRequest expenseRequest = ExpenseRequestFactory.getRandomValidExpenseRequest();
         requestBuilder.contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(expenseRequest));
+
+        state.setCurrentMvcResult(state.getMockMvc()
+                .perform(requestBuilder)
+                .andReturn());
+    }
+
+    @When("he sends a request to delete the expense with id={string}")
+    public void delete_expense(String expenseId) throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = delete("/expense/{expenseId}", expenseId);
+
+        if (state.getCurrentUserRequestPostProcessor() != null) {
+            requestBuilder.with(state.getCurrentUserRequestPostProcessor());
+        }
+
+        state.setCurrentMvcResult(state.getMockMvc()
+                .perform(requestBuilder)
+                .andReturn());
+    }
+
+    @When("he sends a request to delete the last expense created by {string}")
+    public void delete_last_expense_created_by(String username) throws Exception {
+        ExpenseResponse expenseResponse = objectMapper.readValue(state.getUserLastCreatedExpenseResults().get(username).getResponse().getContentAsString(), ExpenseResponse.class);
+        MockHttpServletRequestBuilder requestBuilder = delete("/expense/{expenseId}", expenseResponse.getId());
+
+        if (state.getCurrentUserRequestPostProcessor() != null) {
+            requestBuilder.with(state.getCurrentUserRequestPostProcessor());
+        }
 
         state.setCurrentMvcResult(state.getMockMvc()
                 .perform(requestBuilder)
@@ -135,7 +159,7 @@ public class CucumberWhens extends CucumberStepDefinitions {
 
     @When("he sends a request to retrieve the last expense created by {string}")
     public void retrieve_last_expense_created_by(String username) throws Exception {
-        MvcResult lastMvcResult = state.getCurrentUserResults().get(username);
+        MvcResult lastMvcResult = state.getUserLastCreatedExpenseResults().get(username);
         ExpenseResponse lastExpenseResponse = objectMapper.readValue(lastMvcResult.getResponse().getContentAsString(), ExpenseResponse.class);
         String expenseId = lastExpenseResponse.getId();
 
@@ -158,7 +182,6 @@ public class CucumberWhens extends CucumberStepDefinitions {
             String description,
             Boolean paidWithCreditCard,
             Boolean creditCardStatementIssued) throws Exception {
-        ExpenseRequest expenseRequest = ExpenseRequestFactory.getExpenseRequest(date, amount, tags, description, paidWithCreditCard, creditCardStatementIssued);
         ExpenseResponse expenseResponse = objectMapper.readValue(state.getCurrentUserResults().get(username).getResponse().getContentAsString(), ExpenseResponse.class);
         MockHttpServletRequestBuilder requestBuilder = put("/expense/{expenseId}", expenseResponse.getId());
 
