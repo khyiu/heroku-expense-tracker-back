@@ -12,4 +12,6 @@ public interface ExpenseService {
     ExpenseResponse getExpense(UUID expenseId);
 
     ExpenseResponse updateExpense(UUID expenseId, ExpenseRequest expenseRequest);
+
+    void deleteExpense(UUID expenseId);
 }

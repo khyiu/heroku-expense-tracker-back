@@ -45,8 +45,10 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
         return ResponseEntity.ok(expenseService.updateExpense(UUID.fromString(id), expenseRequest));
     }
 
+    @Secured(ROLE_EXPENSE_TRACKER_USER)
     @Override
     public ResponseEntity<Void> deleteExpense(String id) {
-        return null;
+        expenseService.deleteExpense(UUID.fromString(id));
+        return ResponseEntity.ok().build();
     }
 }

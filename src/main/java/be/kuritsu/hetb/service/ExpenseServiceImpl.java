@@ -71,4 +71,10 @@ public class ExpenseServiceImpl implements ExpenseService {
         existingExpense.setCreditCardStatementIssued(expenseRequest.getCreditCardStatementIssued());
         return expenseMapper.expenseToExpenseResponse(existingExpense);
     }
+
+    @Override
+    public void deleteExpense(UUID expenseId) {
+        Expense expense = expenseRepository.getById(expenseId);
+        expenseRepository.delete(expense);
+    }
 }
