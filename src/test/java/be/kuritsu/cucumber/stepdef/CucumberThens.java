@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import be.kuritsu.cucumber.CucumberState;
+import be.kuritsu.het.model.ExpenseListResponse;
 import be.kuritsu.het.model.ExpenseResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -74,11 +75,8 @@ public class CucumberThens extends CucumberStepDefinitions {
 
     @Then("he receives a list of {int} expense(s)")
     public void assertEmptyListOfExpenses(int expectedNbExpenses) throws Exception {
-        List<ExpenseResponse> expenseList = objectMapper.readValue(state.getCurrentMvcResult().getResponse().getContentAsString(), new TypeReference<>() {
-        });
-
-        assertThat(expenseList).isNotNull()
-                .hasSize(expectedNbExpenses);
+        ExpenseListResponse expenseListResponse = objectMapper.readValue(state.getCurrentMvcResult().getResponse().getContentAsString(), ExpenseListResponse.class);
+        assertThat(expenseListResponse.getItems()).hasSize(expectedNbExpenses);
     }
 
     @Then("he receives a list of expenses containing at index {int} an expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {} and {}")
@@ -89,9 +87,8 @@ public class CucumberThens extends CucumberStepDefinitions {
             String description,
             Boolean paidWithCreditCard,
             Boolean creditCardStatementIssued) throws Exception {
-        List<ExpenseResponse> expenseResponseList = objectMapper.readValue(state.getCurrentMvcResult().getResponse().getContentAsString(), new TypeReference<>() {
-        });
-        ExpenseResponse expenseResponse = expenseResponseList.get(index);
+        ExpenseListResponse expenseListResponse = objectMapper.readValue(state.getCurrentMvcResult().getResponse().getContentAsString(), ExpenseListResponse.class);
+        ExpenseResponse expenseResponse = expenseListResponse.getItems().get(index);
         assertThat(expenseResponse.getId()).isNotNull();
         assertThat(expenseResponse.getVersion()).isNotNull();
         assertThat(expenseResponse.getDate()).isEqualTo(date);
