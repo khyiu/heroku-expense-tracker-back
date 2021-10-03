@@ -16,6 +16,7 @@ import be.kuritsu.cucumber.CucumberState;
 import be.kuritsu.het.model.ExpenseResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Then;
@@ -52,7 +53,7 @@ public class CucumberThens extends CucumberStepDefinitions {
         assertThat(state.getCurrentMvcResult().getResponse().getRedirectedUrl()).isEqualTo(redirectURL);
     }
 
-    @Then("he receives the persisted expense with {nullableDate}, {nullableAmount}, {nullableTags}, {string}, {} and {}")
+    @Then("he receives the persisted expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {} and {}")
     public void assertPersistedExpense(LocalDate date,
             BigDecimal amount,
             List<String> tags,
@@ -61,6 +62,36 @@ public class CucumberThens extends CucumberStepDefinitions {
             Boolean creditCardStatementIssued) throws UnsupportedEncodingException, JsonProcessingException {
 
         ExpenseResponse expenseResponse = objectMapper.readValue(state.getCurrentMvcResult().getResponse().getContentAsString(), ExpenseResponse.class);
+        assertThat(expenseResponse.getId()).isNotNull();
+        assertThat(expenseResponse.getVersion()).isNotNull();
+        assertThat(expenseResponse.getDate()).isEqualTo(date);
+        assertThat(expenseResponse.getAmount()).isEqualByComparingTo(amount);
+        assertThat(expenseResponse.getTags()).containsExactlyElementsOf(tags);
+        assertThat(expenseResponse.getDescription()).isEqualTo(description);
+        assertThat(expenseResponse.getPaidWithCreditCard()).isEqualTo(paidWithCreditCard);
+        assertThat(expenseResponse.getCreditCardStatementIssued()).isEqualTo(creditCardStatementIssued);
+    }
+
+    @Then("he receives a list of {int} expense(s)")
+    public void assertEmptyListOfExpenses(int expectedNbExpenses) throws Exception {
+        List<ExpenseResponse> expenseList = objectMapper.readValue(state.getCurrentMvcResult().getResponse().getContentAsString(), new TypeReference<>() {
+        });
+
+        assertThat(expenseList).isNotNull()
+                .hasSize(expectedNbExpenses);
+    }
+
+    @Then("he receives a list of expenses containing at index {int} an expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {} and {}")
+    public void assertExpenseFromDashboard(int index,
+            LocalDate date,
+            BigDecimal amount,
+            List<String> tags,
+            String description,
+            Boolean paidWithCreditCard,
+            Boolean creditCardStatementIssued) throws Exception {
+        List<ExpenseResponse> expenseResponseList = objectMapper.readValue(state.getCurrentMvcResult().getResponse().getContentAsString(), new TypeReference<>() {
+        });
+        ExpenseResponse expenseResponse = expenseResponseList.get(index);
         assertThat(expenseResponse.getId()).isNotNull();
         assertThat(expenseResponse.getVersion()).isNotNull();
         assertThat(expenseResponse.getDate()).isEqualTo(date);

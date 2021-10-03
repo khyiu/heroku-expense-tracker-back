@@ -104,7 +104,7 @@ public class CucumberWhens extends CucumberStepDefinitions {
                 .andReturn());
     }
 
-    @When("he sends a request to register an expense with {nullableDate}, {nullableAmount}, {nullableTags} and {int}")
+    @When("he sends a request to register an expense with {nullableDate}, {nullableAmount}, {nullableStringList} and {int}")
     public void register_a_parameterized_expense(LocalDate date, BigDecimal amount, List<String> tags, int randomDescriptionLength) throws Exception {
         MockHttpServletRequestBuilder requestBuilder = post("/expenses");
 
@@ -121,7 +121,7 @@ public class CucumberWhens extends CucumberStepDefinitions {
                 .andReturn());
     }
 
-    @When("he sends a request to register an expense with {nullableDate}, {nullableAmount}, {nullableTags}, {string}, {} and {}")
+    @When("he sends a request to register an expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {} and {}")
     public void register_a_parameterized_expense(LocalDate date,
             BigDecimal amount,
             List<String> tags,
@@ -174,7 +174,7 @@ public class CucumberWhens extends CucumberStepDefinitions {
                 .andReturn());
     }
 
-    @When("he sends a request to edit the last expense created by {string} with {nullableDate}, {nullableAmount}, {nullableTags}, {string}, {} and {}")
+    @When("he sends a request to edit the last expense created by {string} with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {} and {}")
     public void register_a_parameterized_expense(String username,
             LocalDate date,
             BigDecimal amount,
@@ -200,6 +200,36 @@ public class CucumberWhens extends CucumberStepDefinitions {
 
         requestBuilder.contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(expenseRequestUpdate));
+
+        state.setCurrentMvcResult(state.getMockMvc()
+                .perform(requestBuilder)
+                .andReturn());
+    }
+
+    @When("he sends a request to retrieve his expenses with page number={int}, "
+            + "page size={int}, "
+            + "sortBy={sortBy}, "
+            + "sortDirection={sortDirection}, "
+            + "tag filters={nullableStringList} "
+            + "and description filter={nullableString}")
+    public void retrieve_expenses(int pageNumber, int pageSize, String sortBy, String sortDirection, List<String> tagFilters, String descriptionFilter) throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = get("/expenses")
+                .param("pageNumber", String.format("%d", pageNumber))
+                .param("pageSize", String.format("%d", pageSize))
+                .param("sortBy", sortBy)
+                .param("sortDirection", sortDirection);
+
+        if (tagFilters != null) {
+            requestBuilder.param("pageFilters", tagFilters.toArray(new String[]{}));
+        }
+
+        if (descriptionFilter != null) {
+            requestBuilder.param("descriptionFilter", descriptionFilter);
+        }
+
+        if (state.getCurrentUserRequestPostProcessor() != null) {
+            requestBuilder.with(state.getCurrentUserRequestPostProcessor());
+        }
 
         state.setCurrentMvcResult(state.getMockMvc()
                 .perform(requestBuilder)

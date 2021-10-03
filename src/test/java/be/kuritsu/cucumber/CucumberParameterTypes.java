@@ -22,7 +22,7 @@ public class CucumberParameterTypes {
     }
 
     @ParameterType(value = "\\w+(?:;\\w+)*|null|;")
-    public List<String> nullableTags(String tags) {
+    public List<String> nullableStringList(String tags) {
         if (tags.equals("null")) {
             return null;
         }
@@ -32,5 +32,20 @@ public class CucumberParameterTypes {
         }
 
         return Arrays.asList(tags.split(";"));
+    }
+
+    @ParameterType(value = "[\\p{Alnum}\\.\\-' ]+|null")
+    public String nullableString(String string) {
+        return string.equals("null") ? null : string;
+    }
+
+    @ParameterType(value = "ASC|DESC")
+    public String sortDirection(String sortDirection) {
+        return sortDirection;
+    }
+
+    @ParameterType(value = "DATE|AMOUNT")
+    public String sortBy(String sortBy) {
+        return sortBy;
     }
 }
