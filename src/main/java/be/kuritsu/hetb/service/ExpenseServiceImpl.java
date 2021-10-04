@@ -111,9 +111,9 @@ public class ExpenseServiceImpl implements ExpenseService {
         PageRequest pageRequest;
 
         if (sortBy == SortBy.DATE) {
-            pageRequest = PageRequest.of(pageNumber - 1, pageSize, sortDir, "date", "amount");
+            pageRequest = PageRequest.of(pageNumber - 1, pageSize, sortDir, "order");
         } else {
-            pageRequest = PageRequest.of(pageNumber - 1, pageSize, sortDir, "amount", "date");
+            pageRequest = PageRequest.of(pageNumber - 1, pageSize, sortDir, "amount", "order");
         }
 
         Page<Expense> page = expenseRepository.findAll(specs, pageRequest);
