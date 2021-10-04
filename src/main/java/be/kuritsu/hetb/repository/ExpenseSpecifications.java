@@ -12,7 +12,6 @@ import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.CollectionUtils;
 
 import be.kuritsu.hetb.domain.Expense;
 
@@ -46,7 +45,7 @@ public class ExpenseSpecifications implements Specification<Expense> {
         }
 
         if (descriptionFilter != null) {
-            String likeCondition = String.format("%%s%", StringUtils.stripAccents(descriptionFilter).toUpperCase(Locale.ROOT));
+            String likeCondition = "%" + StringUtils.stripAccents(descriptionFilter).toUpperCase(Locale.ROOT) + "%";
             Predicate descriptionPredicate = criteriaBuilder.like(criteriaBuilder.upper(root.get("description")), likeCondition);
             predicates.add(descriptionPredicate);
         }
@@ -57,12 +56,10 @@ public class ExpenseSpecifications implements Specification<Expense> {
         }
 
         if (creditCardStatementIssuedFilter != null) {
-            if (paidWithCreditCardFilter != null) {
-                Predicate statementPredicate = criteriaBuilder.equal(root.get("creditCardStatementIssued"), this.creditCardStatementIssuedFilter);
-                predicates.add(statementPredicate);
-            }
+            Predicate statementPredicate = criteriaBuilder.equal(root.get("creditCardStatementIssued"), this.creditCardStatementIssuedFilter);
+            predicates.add(statementPredicate);
         }
 
-        return criteriaBuilder.and(predicates.toArray(new Predicate[]{}));
+        return criteriaBuilder.and(predicates.toArray(new Predicate[] {}));
     }
 }
