@@ -55,13 +55,24 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
         return ResponseEntity.ok().build();
     }
 
+    @Secured(ROLE_EXPENSE_TRACKER_USER)
     @Override
     public ResponseEntity<ExpenseListResponse> getExpenses(Integer pageSize,
             Integer pageNumber,
             String sortDirection,
             String sortBy,
             List<String> tagFilters,
-            String descriptionFilter) {
-        return null;
+            String descriptionFilter,
+            Boolean paidWithCreditCardFilter,
+            Boolean creditCardStatementIssuedFilter) {
+        ExpenseListResponse expenseListResponse = expenseService.getExpenses(pageSize,
+                pageNumber,
+                ExpenseService.SortDirection.valueOf(sortDirection),
+                ExpenseService.SortBy.valueOf(sortBy),
+                tagFilters,
+                descriptionFilter,
+                paidWithCreditCardFilter,
+                creditCardStatementIssuedFilter);
+        return ResponseEntity.ok(expenseListResponse);
     }
 }

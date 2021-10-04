@@ -3,6 +3,7 @@ package be.kuritsu.hetb.domain;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -17,6 +18,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Version;
+
+import org.springframework.lang.NonNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -64,6 +67,15 @@ public class Expense {
 
     @Column(name = "\"order\"")
     private LocalDateTime order;
+
+    public void setTags(@NonNull Set<String> tags) {
+        this.tags.clear();
+        this.tags.addAll(tags);
+    }
+
+    public Set<String> getTags() {
+        return Collections.unmodifiableSet(this.tags);
+    }
 
     @Override
     public boolean equals(Object o) {

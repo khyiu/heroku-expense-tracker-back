@@ -18,6 +18,8 @@ Feature: Expense dashboard
     And he receives a list of 0 expense
 
   Scenario: an authenticated user with sufficient permissions retrieves his expenses
+    Given an authenticated user, "Alice", with role "EXPENSE-TRACKER-USER"
+    And he sends a request to register an expense with 01/09/2021, 649.00, electromenager, "aspirateur Dyson v11", true and false
     Given an authenticated user, "Will", with role "EXPENSE-TRACKER-USER"
     And he sends a request to register an expense with 01/05/2021, 3.50, frais_bancaire;Belfius, "frais de gestion compte à vue", false and false
     And he sends a request to register an expense with 01/04/2021, 3.50, frais_bancaire;Belfius, "frais de gestion compte à vue", false and false
