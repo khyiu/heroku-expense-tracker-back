@@ -216,4 +216,14 @@ Eventually, I got Maven picking my integration test classes with the following c
 public class CucumberIT {
 }
 ```
-   
+
+### 10 Enable CORS
+As long as CORS is not enabled, no web application will be able to reach this back-end's endpoints as preflights requests will fail like this:
+
+![failing preflight requests due to CORS being disabled](doc/failing-preflight-cors-disabled.png)
+
+To enable CORS, since we are using the Keycloak adapter for Springboot, we simply need to add the following config in `application.properties`:
+
+```properties
+keycloak.cors=true
+```
