@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
@@ -18,7 +16,7 @@ import be.kuritsu.hetb.domain.Expense;
 
 public class ExpenseMapperTest {
 
-    private ExpenseMapper expenseMapper = new ExpenseMapperImpl();
+    private final ExpenseMapper expenseMapper = new ExpenseMapperImpl();
 
     @Test
     public void test_expense_request_to_request_null_input() {
@@ -70,7 +68,7 @@ public class ExpenseMapperTest {
                 .description("Entretien annuel - garage Beerens Zaventem")
                 .paidWithCreditCard(false)
                 .owner("test-user")
-                .order(LocalDateTime.of(date, LocalTime.ofSecondOfDay(1)))
+                .order(1)
                 .build();
 
         ExpenseResponse expenseResponse = expenseMapper.expenseToExpenseResponse(expense);

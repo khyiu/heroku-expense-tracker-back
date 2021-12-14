@@ -53,7 +53,7 @@
 		<renameColumn schemaName="het" tableName="expense" oldColumnName="paidWithCreditCard" newColumnName="paid_with_credit_card"/>
 		<renameColumn schemaName="het" tableName="expense" oldColumnName="creditCardStatementIssued" newColumnName="credit_card_statement_issued"/>
 	</changeSet>
-	
+
 	<changeSet id="add_expense_order_column" author="kyiu">
 		<addColumn schemaName="het" tableName="expense">
 			<column name="order" type="timestamp">
@@ -71,4 +71,13 @@
 		<addUniqueConstraint schemaName="het" tableName="expense" columnNames="date, order, owner" constraintName="expense_date_order_unique"/>
 	</changeSet>
 
+	<changeSet id="delete_all_expense_data" author="kyiu">
+		<comment>As we'll redefine the expense.order column datatype we'll have to delete all existing test data</comment>
+		<delete schemaName="het" tableName="expense_tag"></delete>
+		<delete schemaName="het" tableName="expense"></delete>
+	</changeSet>
+
+	<changeSet id="change_expense_order_data_type" author="kyiu">
+		<modifyDataType schemaName="het" tableName="expense" columnName="order" newDataType="int"></modifyDataType>
+	</changeSet>
 </databaseChangeLog>

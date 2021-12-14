@@ -1,8 +1,6 @@
 package be.kuritsu.hetb.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,8 +27,6 @@ import be.kuritsu.hetb.repository.ExpenseSpecifications;
 @Service
 @Transactional
 public class ExpenseServiceImpl implements ExpenseService {
-
-    private static final int DEFAULT_ORDER_CREATION_OFFSET = 100;
 
     private final ExpenseRepository expenseRepository;
     private final ExpenseMapper expenseMapper;
@@ -64,9 +60,9 @@ public class ExpenseServiceImpl implements ExpenseService {
         return expenseMapper.expenseToExpenseResponse(expense);
     }
 
-    private LocalDateTime computeExpenseOrder(String owner, LocalDate date) {
+    private Integer computeExpenseOrder(String owner, LocalDate date) {
         long count = expenseRepository.countByOwnerAndDate(owner, date);
-        return LocalDateTime.of(date, LocalTime.ofSecondOfDay(count + DEFAULT_ORDER_CREATION_OFFSET));
+        return Math.toIntExact(count + 1);
     }
 
     @Override

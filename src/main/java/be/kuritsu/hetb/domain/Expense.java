@@ -2,7 +2,6 @@ package be.kuritsu.hetb.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
@@ -66,7 +65,7 @@ public class Expense {
     private Set<String> tags = new TreeSet<>();
 
     @Column(name = "\"order\"")
-    private LocalDateTime order;
+    private Integer order;
 
     public void setTags(@NonNull Set<String> tags) {
         this.tags.clear();
