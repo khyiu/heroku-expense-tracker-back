@@ -78,6 +78,13 @@
 	</changeSet>
 
 	<changeSet id="change_expense_order_data_type" author="kyiu">
-		<modifyDataType schemaName="het" tableName="expense" columnName="order" newDataType="int"></modifyDataType>
+		<dropUniqueConstraint schemaName="het" tableName="expense" constraintName="expense_date_order_unique"/>
+		<dropColumn schemaName="het" tableName="expense" columnName="order"/>
+		<addColumn schemaName="het" tableName="expense">
+			<column name="order" type="int">
+				<constraints nullable="false" notNullConstraintName="expense_order_not_null"/>
+			</column>
+		</addColumn>
+		<addUniqueConstraint schemaName="het" tableName="expense" columnNames="date, order, owner" constraintName="expense_date_order_unique"/>
 	</changeSet>
 </databaseChangeLog>
