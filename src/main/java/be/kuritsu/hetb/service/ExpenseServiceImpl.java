@@ -1,6 +1,5 @@
 package be.kuritsu.hetb.service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,6 +21,7 @@ import be.kuritsu.het.model.ExpenseResponse;
 import be.kuritsu.hetb.domain.Expense;
 import be.kuritsu.hetb.mapper.ExpenseMapper;
 import be.kuritsu.hetb.repository.ExpenseRepository;
+import be.kuritsu.hetb.repository.ExpenseSequenceRepository;
 import be.kuritsu.hetb.repository.ExpenseSpecifications;
 
 @Service
@@ -29,11 +29,13 @@ import be.kuritsu.hetb.repository.ExpenseSpecifications;
 public class ExpenseServiceImpl implements ExpenseService {
 
     private final ExpenseRepository expenseRepository;
+    private final ExpenseSequenceRepository expenseSequenceRepository;
     private final ExpenseMapper expenseMapper;
 
     @Autowired
-    public ExpenseServiceImpl(ExpenseRepository expenseRepository, ExpenseMapper expenseMapper) {
+    public ExpenseServiceImpl(ExpenseRepository expenseRepository, ExpenseSequenceRepository expenseSequenceRepository, ExpenseMapper expenseMapper) {
         this.expenseRepository = expenseRepository;
+        this.expenseSequenceRepository = expenseSequenceRepository;
         this.expenseMapper = expenseMapper;
     }
 
@@ -43,7 +45,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         String owner = SecurityContextHolder.getContext().getAuthentication().getName();
         expense.setOwner(owner);
-        expense.setOrder(computeExpenseOrder(owner, expense.getDate()));
+        expense.setOrder(expenseSequenceRepository.getNextOrderSequenceValue());
         expense.setDescription(StringUtils.stripAccents(expense.getDescription()));
         expense.setTags(expense.getTags()
                 .stream()
@@ -60,18 +62,12 @@ public class ExpenseServiceImpl implements ExpenseService {
         return expenseMapper.expenseToExpenseResponse(expense);
     }
 
-    private Integer computeExpenseOrder(String owner, LocalDate date) {
-        long count = expenseRepository.countByOwnerAndDate(owner, date);
-        return Math.toIntExact(count + 1);
-    }
-
     @Override
     public ExpenseResponse updateExpense(UUID expenseId, ExpenseRequest expenseRequest) {
         Expense existingExpense = expenseRepository.getById(expenseId);
 
         if (!existingExpense.getDate().equals(expenseRequest.getDate())) {
-            String owner = SecurityContextHolder.getContext().getAuthentication().getName();
-            existingExpense.setOrder(computeExpenseOrder(owner, expenseRequest.getDate()));
+            existingExpense.setOrder(expenseSequenceRepository.getNextOrderSequenceValue());
         }
 
         existingExpense.setDate(expenseRequest.getDate());

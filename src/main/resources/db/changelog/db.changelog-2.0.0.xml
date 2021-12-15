@@ -87,4 +87,8 @@
 		</addColumn>
 		<addUniqueConstraint schemaName="het" tableName="expense" columnNames="date, order, owner" constraintName="expense_date_order_unique"/>
 	</changeSet>
+
+	<changeSet id="create_expense_order_sequence" author="kyiu">
+		<createSequence schemaName="het" sequenceName="expense_order_seq" startValue="1" incrementBy="1" cycle="true"/>
+	</changeSet>
 </databaseChangeLog>

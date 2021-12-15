@@ -2,6 +2,7 @@ package be.kuritsu.cucumber.stepdef;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.context.WebApplicationContext;
 
 import be.kuritsu.cucumber.CucumberSpringConfig;
@@ -15,6 +16,7 @@ import io.cucumber.spring.CucumberContextConfiguration;
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = { HerokuExpenseTrackerBackApplication.class, CucumberSpringConfig.class })
+@ActiveProfiles("test")
 public abstract class CucumberStepDefinitions {
 
     @Autowired

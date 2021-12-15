@@ -1,6 +1,5 @@
 package be.kuritsu.hetb.repository;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +15,4 @@ public interface ExpenseRepository extends JpaRepository<Expense, UUID>, JpaSpec
     @SecuritySubject
     @Override
     Expense getById(UUID uuid);
-
-    long countByOwnerAndDate(String owner, LocalDate date);
 }

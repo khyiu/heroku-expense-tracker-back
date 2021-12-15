@@ -35,4 +35,4 @@ Feature: Expense dashboard
     Then he gets a response with status 200
     And he receives a list of 2 expenses
     And he receives a list of expenses containing at index 0 an expense with 15/04/2021, 27.50, courses, "Courses @ Carrefour", true and false
-    And he receives a list of expenses containing at index 1 an expense with 01/05/2021, 3.50, frais_bancaire;Belfius, "frais de gestion compte a vue", false and false
+    And he receives a list of expenses containing at index 1 an expense with 01/04/2021, 3.50, frais_bancaire;Belfius, "frais de gestion compte a vue", false and false
