@@ -55,6 +55,8 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         return new HttpSessionManager();
     }
 
+    // Ignore security hotspot about CSRF as this back-end API is intended to an Angular SPA that is deployed separately
+    @SuppressWarnings("java:S4502")
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         super.configure(httpSecurity);
@@ -68,7 +70,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
                  */
                 .and()
                 .csrf().disable();
-}
+    }
 
     @Bean
     public KeycloakSpringBootConfigResolver keycloakSpringBootConfigResolver() {
