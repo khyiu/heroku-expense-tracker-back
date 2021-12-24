@@ -67,11 +67,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
                  Let's disable CSRF for the moment. We'll check later if it's worth switching it back on.
                  */
                 .and()
-                .csrf()
-                .ignoringAntMatchers(
-                        "/expense/**",
-                        "/expenses/**"
-                );
+                .csrf().disable();
 }
 
     @Bean
