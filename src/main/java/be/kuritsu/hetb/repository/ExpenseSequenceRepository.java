@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ExpenseSequenceRepository extends ExpenseRepository{
 
-    @Query(nativeQuery = true, value = "select het.expense_order_seq.nextval from dual")
+    @Query(nativeQuery = true, value = "select nextval('het.expense_order_seq')")
     int getNextOrderSequenceValue();
 }
