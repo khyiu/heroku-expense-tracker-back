@@ -103,7 +103,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         PageRequest pageRequest;
 
         if (sortBy == SortBy.DATE) {
-            pageRequest = PageRequest.of(pageNumber - 1, pageSize, sortDir, "order");
+            pageRequest = PageRequest.of(pageNumber - 1, pageSize, sortDir, "date", "order");
         } else {
             pageRequest = PageRequest.of(pageNumber - 1, pageSize, sortDir, "amount", "order");
         }
