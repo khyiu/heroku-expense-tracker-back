@@ -116,7 +116,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         ExpenseListResponse response = new ExpenseListResponse();
         response.setPageNumber(page.getNumber() + 1);
         response.setPageSize(page.getSize());
-        response.setTotalNumberOfItems(page.getNumberOfElements());
+        response.setTotalNumberOfItems(Math.toIntExact(page.getTotalElements()));
         response.setItems(page.get()
                 .map(expenseMapper::expenseToExpenseResponse)
                 .collect(Collectors.toList()));
