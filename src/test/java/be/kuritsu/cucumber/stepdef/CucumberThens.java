@@ -98,4 +98,10 @@ public class CucumberThens extends CucumberStepDefinitions {
         assertThat(expenseResponse.getPaidWithCreditCard()).isEqualTo(paidWithCreditCard);
         assertThat(expenseResponse.getCreditCardStatementIssued()).isEqualTo(creditCardStatementIssued);
     }
+
+    @Then("he receives a balance equal to {nullableAmount}")
+    public void assertExpensesBalance(BigDecimal balance) throws Exception {
+        BigDecimal fetchedBalance = objectMapper.readValue(state.getCurrentMvcResult().getResponse().getContentAsString(), BigDecimal.class);
+        assertThat(fetchedBalance).isEqualByComparingTo(balance);
+    }
 }

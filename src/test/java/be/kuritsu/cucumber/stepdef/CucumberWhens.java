@@ -220,12 +220,25 @@ public class CucumberWhens extends CucumberStepDefinitions {
                 .param("sortDirection", sortDirection);
 
         if (tagFilters != null) {
-            requestBuilder.param("pageFilters", tagFilters.toArray(new String[]{}));
+            requestBuilder.param("pageFilters", tagFilters.toArray(new String[] {}));
         }
 
         if (descriptionFilter != null) {
             requestBuilder.param("descriptionFilter", descriptionFilter);
         }
+
+        if (state.getCurrentUserRequestPostProcessor() != null) {
+            requestBuilder.with(state.getCurrentUserRequestPostProcessor());
+        }
+
+        state.setCurrentMvcResult(state.getMockMvc()
+                .perform(requestBuilder)
+                .andReturn());
+    }
+
+    @When("he sends a request to retrieve his expenses balance")
+    public void retrieve_balance() throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = get("/balance");
 
         if (state.getCurrentUserRequestPostProcessor() != null) {
             requestBuilder.with(state.getCurrentUserRequestPostProcessor());
