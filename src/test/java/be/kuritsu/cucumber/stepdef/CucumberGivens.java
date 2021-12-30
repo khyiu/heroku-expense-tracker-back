@@ -1,8 +1,18 @@
 package be.kuritsu.cucumber.stepdef;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
+import java.util.Collections;
+import java.util.Set;
+
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.adapters.RefreshableKeycloakSecurityContext;
+import org.keycloak.adapters.springsecurity.account.KeycloakRole;
+import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
+import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
+import org.keycloak.representations.AccessToken;
+import org.keycloak.representations.IDToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -38,8 +48,27 @@ public class CucumberGivens extends CucumberStepDefinitions {
     }
 
     @Given("an authenticated user, {string}, with role {string}")
-    public void an_authenticated_user_bob_with_role_expense_tracker_test_user(String username, String role) {
+    public void an_authenticated_user_with_role(String username, String role) {
         state.setCurrentUsername(username);
-        state.setCurrentUserRequestPostProcessor(user(username).roles(role));
+
+        AccessToken accessToken = new AccessToken();
+        accessToken.exp(Long.MAX_VALUE);
+        accessToken.issuer("kuritsu");
+        accessToken.setPreferredUsername(username);
+        RefreshableKeycloakSecurityContext keycloakSecurityContext = new RefreshableKeycloakSecurityContext(
+                null,
+                null,
+                "dummy_token_string",
+                accessToken,
+                "dummy_id_token_string",
+                new IDToken(),
+                "dummy_refresh_token"
+        );
+        SimpleKeycloakAccount keycloakAccount = new SimpleKeycloakAccount(new KeycloakPrincipal<>(username, keycloakSecurityContext),
+                Set.of("ROLE_" + role),
+                keycloakSecurityContext);
+        KeycloakAuthenticationToken keycloakAuthenticationToken = new KeycloakAuthenticationToken(keycloakAccount, false, Collections.singletonList(new KeycloakRole("ROLE_" + role)));
+
+        state.setCurrentUserRequestPostProcessor(authentication(keycloakAuthenticationToken));
     }
 }

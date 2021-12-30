@@ -11,18 +11,23 @@ import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import be.kuritsu.hetb.domain.Expense;
 
 public class ExpenseSpecifications implements Specification<Expense> {
 
+    private final String ownerUsername;
     private final List<String> tagFilters;
     private final String descriptionFilter;
     private final Boolean paidWithCreditCardFilter;
     private final Boolean creditCardStatementIssuedFilter;
 
-    public ExpenseSpecifications(List<String> tagFilters, String descriptionFilter, Boolean paidWithCreditCardFilter, Boolean creditCardStatementIssuedFilter) {
+    public ExpenseSpecifications(String ownerUsername,
+            List<String> tagFilters,
+            String descriptionFilter,
+            Boolean paidWithCreditCardFilter,
+            Boolean creditCardStatementIssuedFilter) {
+        this.ownerUsername = ownerUsername;
         this.tagFilters = tagFilters;
         this.descriptionFilter = descriptionFilter;
         this.paidWithCreditCardFilter = paidWithCreditCardFilter;
@@ -33,8 +38,7 @@ public class ExpenseSpecifications implements Specification<Expense> {
     public Predicate toPredicate(Root<Expense> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Predicate ownerPredicate = criteriaBuilder.equal(root.get("owner"), username);
+        Predicate ownerPredicate = criteriaBuilder.equal(root.get("owner"), ownerUsername);
         predicates.add(ownerPredicate);
 
         if (tagFilters != null) {

@@ -12,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import be.kuritsu.het.model.ExpenseListResponse;
@@ -23,27 +22,33 @@ import be.kuritsu.hetb.mapper.ExpenseMapper;
 import be.kuritsu.hetb.repository.ExpenseRepository;
 import be.kuritsu.hetb.repository.ExpenseSequenceRepository;
 import be.kuritsu.hetb.repository.ExpenseSpecifications;
+import be.kuritsu.hetb.security.SecurityContextService;
 
 @Service
 @Transactional
 public class ExpenseServiceImpl implements ExpenseService {
 
+    private final SecurityContextService securityContextService;
     private final ExpenseRepository expenseRepository;
     private final ExpenseSequenceRepository expenseSequenceRepository;
     private final ExpenseMapper expenseMapper;
 
     @Autowired
-    public ExpenseServiceImpl(ExpenseRepository expenseRepository, ExpenseSequenceRepository expenseSequenceRepository, ExpenseMapper expenseMapper) {
+    public ExpenseServiceImpl(ExpenseRepository expenseRepository,
+            ExpenseSequenceRepository expenseSequenceRepository,
+            ExpenseMapper expenseMapper,
+            SecurityContextService securityContextService) {
         this.expenseRepository = expenseRepository;
         this.expenseSequenceRepository = expenseSequenceRepository;
         this.expenseMapper = expenseMapper;
+        this.securityContextService = securityContextService;
     }
 
     @Override
     public ExpenseResponse registerExpense(ExpenseRequest expenseRequest) {
         Expense expense = expenseMapper.expenseRequestToRequest(expenseRequest);
 
-        String owner = SecurityContextHolder.getContext().getAuthentication().getName();
+        String owner = securityContextService.getAuthenticatedUserName();
         expense.setOwner(owner);
         expense.setOrder(expenseSequenceRepository.getNextOrderSequenceValue());
         expense.setDescription(StringUtils.stripAccents(expense.getDescription()));
@@ -99,7 +104,9 @@ public class ExpenseServiceImpl implements ExpenseService {
             Boolean creditCardStatementIssuedFilter) {
 
         Sort.Direction sortDir = sortDirection == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC;
-        ExpenseSpecifications specs = new ExpenseSpecifications(tagFilters, descriptionFilter, paidWithCreditCardFilter, creditCardStatementIssuedFilter);
+
+        ExpenseSpecifications specs = new ExpenseSpecifications(securityContextService.getAuthenticatedUserName(),
+                tagFilters, descriptionFilter, paidWithCreditCardFilter, creditCardStatementIssuedFilter);
         PageRequest pageRequest;
 
         if (sortBy == SortBy.DATE) {
