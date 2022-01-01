@@ -5,7 +5,7 @@ import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service("securityContextService")
 public class SecurityContextServiceImpl implements SecurityContextService {
 
     @Override

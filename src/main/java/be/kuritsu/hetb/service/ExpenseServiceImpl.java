@@ -8,6 +8,7 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import be.kuritsu.het.model.ExpenseListResponse;
 import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.het.model.ExpenseResponse;
+import be.kuritsu.hetb.caching.CacheNames;
 import be.kuritsu.hetb.domain.Expense;
 import be.kuritsu.hetb.mapper.ExpenseMapper;
 import be.kuritsu.hetb.repository.ExpenseRepository;
@@ -44,6 +46,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         this.securityContextService = securityContextService;
     }
 
+    @CacheEvict(value = CacheNames.USER_BALANCE_CACHE, key = "@securityContextService.getAuthenticatedUserName()")
     @Override
     public ExpenseResponse registerExpense(ExpenseRequest expenseRequest) {
         Expense expense = expenseMapper.expenseRequestToRequest(expenseRequest);
@@ -67,6 +70,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         return expenseMapper.expenseToExpenseResponse(expense);
     }
 
+    @CacheEvict(value = CacheNames.USER_BALANCE_CACHE, key = "@securityContextService.getAuthenticatedUserName()")
     @Override
     public ExpenseResponse updateExpense(UUID expenseId, ExpenseRequest expenseRequest) {
         Expense existingExpense = expenseRepository.getById(expenseId);
@@ -87,6 +91,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         return expenseMapper.expenseToExpenseResponse(existingExpense);
     }
 
+    @CacheEvict(value = CacheNames.USER_BALANCE_CACHE, key = "@securityContextService.getAuthenticatedUserName()")
     @Override
     public void deleteExpense(UUID expenseId) {
         Expense expense = expenseRepository.getById(expenseId);

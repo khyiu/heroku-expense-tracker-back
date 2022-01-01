@@ -182,23 +182,25 @@ Eventually, I got Maven picking my integration test classes with the following c
 1. Add necessary dependencies  
  
 ```XML
-<dependency>
-   <groupId>io.cucumber</groupId>
-   <artifactId>cucumber-java</artifactId>
-   <version>${cucumber.version}</version>
-</dependency>
-<dependency>
-    <groupId>io.cucumber</groupId>
-    <artifactId>cucumber-junit</artifactId>
-    <version>${cucumber.version}</version>
-    <scope>test</scope>
-</dependency>
-<dependency>
-    <groupId>io.cucumber</groupId>
-    <artifactId>cucumber-spring</artifactId>
-    <version>${cucumber.version}</version>
-    <scope>test</scope>
-</dependency>
+<dependencies>
+   <dependency>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-java</artifactId>
+      <version>${cucumber.version}</version>
+   </dependency>
+   <dependency>
+       <groupId>io.cucumber</groupId>
+       <artifactId>cucumber-junit</artifactId>
+       <version>${cucumber.version}</version>
+       <scope>test</scope>
+   </dependency>
+   <dependency>
+       <groupId>io.cucumber</groupId>
+       <artifactId>cucumber-spring</artifactId>
+       <version>${cucumber.version}</version>
+       <scope>test</scope>
+   </dependency>
+</dependencies>
  ```
 
 2. Place Gherkin feature files in `src/test/resources/cucumber-features`
@@ -227,3 +229,52 @@ To enable CORS, since we are using the Keycloak adapter for Springboot, we simpl
 ```properties
 keycloak.cors=true
 ```
+
+### 11 Add caching - EHCache
+
+1. Add dependencies:
+   ```xml
+   <dependencies>
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-cache</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.ehcache</groupId>
+         <artifactId>ehcache</artifactId>
+      </dependency>
+   </dependencies>
+   ```
+
+2. In application properties, specify where to find the EHCache caches configuration:
+
+   ```properties
+   spring.cache.jcache.config=classpath:caching/ehcache.xml
+   ```
+
+3. Create `ehcache.xml` file to configure the caches. In this file, we can define and configure caches and cache event listeners.  
+   We can also enable management through JMX and expose EHCache statistics: 
+
+   ```xml
+   <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.ehcache.org/v3"
+        xmlns:jsr107="http://www.ehcache.org/v3/jsr107"
+        xsi:schemaLocation="
+            http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.0.xsd
+            http://www.ehcache.org/v3/jsr107 http://www.ehcache.org/schema/ehcache-107-ext-3.0.xsd">
+
+       <service>
+          <jsr107:defaults enable-management="true" enable-statistics="true"/>
+       </service>
+   </config>
+   ```
+
+4. Enable Spring annotation-based caching feature by using the `@EnableCaching` annotation in a Spring configuration class.   
+   From that point, we can use `@Cacheable`, `@CacheEvict`, ... to specify what information we would like to put in the cache, and when to remove them from it. 
+
+5. Add `caches` and `metrics` Spring Actuator endpoints, to the `management.endpoints.web.exposure.include` application property.  
+   These 2 endpoints list the caches that have been created and some basic statistics such as the number of times data have been read/removed from caches.
