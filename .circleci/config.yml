@@ -26,6 +26,9 @@ jobs:
           name: Deploy to Heroku
           command: HEROKU_API_KEY="${HEROKU_API_KEY}" mvn heroku:deploy
 
+orbs:
+  jira: circleci/jira@1.3.1
+
 workflows:
   # Below is the definition of your workflow.
   # Inside the workflow, you provide the jobs you want to run, e.g this workflow runs the build-and-test job above.
@@ -35,3 +38,5 @@ workflows:
     jobs:
       - build-and-test:
           context: SonarCloud
+          post-steps:
+            - jira/notify
