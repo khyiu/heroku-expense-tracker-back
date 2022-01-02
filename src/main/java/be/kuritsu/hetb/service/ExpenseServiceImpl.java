@@ -1,6 +1,5 @@
 package be.kuritsu.hetb.service;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -12,7 +11,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import be.kuritsu.het.model.ExpenseListResponse;
@@ -99,25 +97,21 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    public ExpenseListResponse getExpenses(@NonNull Integer pageSize,
-            @NonNull Integer pageNumber,
-            @NonNull SortDirection sortDirection,
-            @NonNull SortBy sortBy,
-            List<String> tagFilters,
-            String descriptionFilter,
-            Boolean paidWithCreditCardFilter,
-            Boolean creditCardStatementIssuedFilter) {
+    public ExpenseListResponse getExpenses(ExpenseListRequest expenseListRequest) {
 
-        Sort.Direction sortDir = sortDirection == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort.Direction sortDir = expenseListRequest.sortDirection() == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC;
 
         ExpenseSpecifications specs = new ExpenseSpecifications(securityContextService.getAuthenticatedUserName(),
-                tagFilters, descriptionFilter, paidWithCreditCardFilter, creditCardStatementIssuedFilter);
+                expenseListRequest.tagFilters(),
+                expenseListRequest.descriptionFilter(),
+                expenseListRequest.paidWithCreditCardFilter(),
+                expenseListRequest.creditCardStatementIssuedFilter());
         PageRequest pageRequest;
 
-        if (sortBy == SortBy.DATE) {
-            pageRequest = PageRequest.of(pageNumber - 1, pageSize, sortDir, "date", "order");
+        if (expenseListRequest.sortBy() == SortBy.DATE) {
+            pageRequest = PageRequest.of(expenseListRequest.pageNumber() - 1, expenseListRequest.pageSize(), sortDir, "date", "order");
         } else {
-            pageRequest = PageRequest.of(pageNumber - 1, pageSize, sortDir, "amount", "order");
+            pageRequest = PageRequest.of(expenseListRequest.pageNumber() - 1, expenseListRequest.pageSize(), sortDir, "amount", "order");
         }
 
         Page<Expense> page = expenseRepository.findAll(specs, pageRequest);

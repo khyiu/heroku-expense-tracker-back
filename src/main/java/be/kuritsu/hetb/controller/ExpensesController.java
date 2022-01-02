@@ -64,14 +64,15 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
             String descriptionFilter,
             Boolean paidWithCreditCardFilter,
             Boolean creditCardStatementIssuedFilter) {
-        ExpenseListResponse expenseListResponse = expenseService.getExpenses(pageSize,
+        ExpenseService.ExpenseListRequest expenseListRequest = new ExpenseService.ExpenseListRequest(pageSize,
                 pageNumber,
                 ExpenseService.SortDirection.valueOf(sortDirection),
-                ExpenseService.SortBy.valueOf(sortBy),
-                tagFilters,
-                descriptionFilter,
-                paidWithCreditCardFilter,
-                creditCardStatementIssuedFilter);
-        return ResponseEntity.ok(expenseListResponse);
+                ExpenseService.SortBy.valueOf(sortBy))
+                .tagFilters(tagFilters)
+                .descriptionFilter(descriptionFilter)
+                .paidWithCreditCardFilter(paidWithCreditCardFilter)
+                .creditCardStatementIssuedFilter(creditCardStatementIssuedFilter);
+
+        return ResponseEntity.ok(expenseService.getExpenses(expenseListRequest));
     }
 }

@@ -9,6 +9,10 @@ import be.kuritsu.het.model.ExpenseListResponse;
 import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.het.model.ExpenseResponse;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
 public interface ExpenseService {
 
     enum SortDirection {
@@ -29,12 +33,29 @@ public interface ExpenseService {
 
     void deleteExpense(UUID expenseId);
 
-    ExpenseListResponse getExpenses(@NonNull Integer pageSize,
-            @NonNull Integer pageNumber,
-            @NonNull SortDirection sortDirection,
-            @NonNull SortBy sortBy,
-            List<String> tagFilters,
-            String descriptionFilter,
-            Boolean paidWithCreditCardFilter,
-            Boolean creditCardStatementIssuedFilter);
+    ExpenseListResponse getExpenses(ExpenseListRequest expenseListRequest);
+
+    @Accessors(fluent = true, chain = true)
+    @Getter
+    @Setter
+    class ExpenseListRequest {
+        private final Integer pageSize;
+        private final Integer pageNumber;
+        private final SortDirection sortDirection;
+        private final SortBy sortBy;
+        private List<String> tagFilters;
+        private String descriptionFilter;
+        private Boolean paidWithCreditCardFilter;
+        private Boolean creditCardStatementIssuedFilter;
+
+        public ExpenseListRequest(@NonNull Integer pageSize,
+                @NonNull Integer pageNumber,
+                @NonNull SortDirection sortDirection,
+                @NonNull SortBy sortBy) {
+            this.pageSize = pageSize;
+            this.pageNumber = pageNumber;
+            this.sortDirection = sortDirection;
+            this.sortBy = sortBy;
+        }
+    }
 }
