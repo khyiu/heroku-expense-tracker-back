@@ -40,4 +40,4 @@ workflows:
           context: SonarCloud
           post-steps:
             - jira/notify:
-                token_name: JIRA_ORB_API_TOKEN
+                token_name: JIRA_TOKEN
