@@ -31,6 +31,7 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     public static final String ROLE_EXPENSE_TRACKER_USER = "ROLE_EXPENSE-TRACKER-USER";
+    public static final String EXPENSE_TRACKER_ADMIN = "EXPENSE-TRACKER-ADMIN";
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder authenticationManagerBuilder) {
@@ -61,7 +62,8 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         super.configure(httpSecurity);
         httpSecurity.authorizeRequests()
-                .antMatchers("/actuator/**").permitAll()
+                .antMatchers("/actuator").hasRole(EXPENSE_TRACKER_ADMIN)
+                .antMatchers("/actuator/**").hasRole(EXPENSE_TRACKER_ADMIN)
                 .antMatchers("/**").fullyAuthenticated()
                 /*
                  By default Spring security enables CSRF. As a consequence, a CSRF token need to be provided
