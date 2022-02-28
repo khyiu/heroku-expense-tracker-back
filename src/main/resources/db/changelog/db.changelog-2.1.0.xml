@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+	<changeSet id="make_expense_tags_into_entity" author="kyiu">
+		<createTable schemaName="het" tableName="tag">
+			<column name="id" type="uuid">
+				<constraints nullable="false" notNullConstraintName="expense_tag_expense_id_not_null" primaryKey="true"/>
+			</column>
+			<column name="value" type="varchar(50)">
+				<constraints nullable="false" notNullConstraintName="expense_tag_value_not_null"/>
+			</column>
+			<column name="owner" type="varchar(128)">
+				<constraints nullable="false" notNullConstraintName="expense_owner_not_null"/>
+			</column>
+		</createTable>
+		<addUniqueConstraint schemaName="het" tableName="tag" columnNames="value, owner" constraintName="tag_value_owner_unique"/>
+	</changeSet>
+
+	<changeSet id="drop_expense_tag_element_collection_table" author="kyiu">
+		<dropTable schemaName="het" tableName="expense_tag"></dropTable>
+	</changeSet>
+
+	<changeSet id="create_expense_tag_join_table" author="kyiu">
+		<createTable schemaName="het" tableName="expense_tag">
+			<column name="expense_id" type="uuid">
+				<constraints nullable="false" notNullConstraintName="expense_tag_expense_id_not_null"/>
+			</column>
+			<column name="tag_id" type="uuid">
+				<constraints nullable="false" notNullConstraintName="expense_tag_tag_id_not_null"/>
+			</column>
+		</createTable>
+
+		<addForeignKeyConstraint baseTableSchemaName="het"
+								 baseTableName="expense_tag"
+								 baseColumnNames="expense_id"
+								 referencedTableSchemaName="het"
+								 referencedTableName="expense"
+								 referencedColumnNames="id"
+								 constraintName="expense_tag_expense_fk"/>
+
+		<createIndex schemaName="het" tableName="expense_tag" indexName="expense_tag_expense_id_idx">
+			<column name="expense_id"/>
+		</createIndex>
+
+		<addForeignKeyConstraint baseTableSchemaName="het"
+								 baseTableName="expense_tag"
+								 baseColumnNames="tag_id"
+								 referencedTableSchemaName="het"
+								 referencedTableName="tag"
+								 referencedColumnNames="id"
+								 constraintName="expense_tag_tag_fk"/>
+
+		<createIndex schemaName="het" tableName="expense_tag" indexName="expense_tag_tag_id_idx">
+			<column name="tag_id"/>
+		</createIndex>
+
+	</changeSet>
+</databaseChangeLog>

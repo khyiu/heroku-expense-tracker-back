@@ -6,10 +6,12 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
 import be.kuritsu.het.model.ExpenseRequest;
+import be.kuritsu.het.model.Tag;
 
 public class ExpenseRequestFactory {
     private static final LocalDate MIN_DATE = LocalDate.of(2000, 1, 1);
@@ -35,7 +37,7 @@ public class ExpenseRequestFactory {
             expenseRequest.setCreditCardStatementIssued(ThreadLocalRandom.current().nextBoolean());
         }
 
-        expenseRequest.setTags(Collections.singletonList(getRandomString(1, 50)));
+        expenseRequest.setTags(Collections.singletonList(new Tag().value(getRandomString(1, 50))));
         return expenseRequest;
     }
 
@@ -43,10 +45,12 @@ public class ExpenseRequestFactory {
         ExpenseRequest expenseRequest = new ExpenseRequest();
         expenseRequest.setDate(date);
         expenseRequest.setAmount(amount);
-        expenseRequest.setTags(tags);
+        expenseRequest.setTags(tags.stream()
+                                       .map(tag -> new Tag().value(tag))
+                                       .collect(Collectors.toList()));
         expenseRequest.setDescription(lengthOfRandomDescription == 0 ?
-                null :
-                RandomStringUtils.random(lengthOfRandomDescription));
+                                              null :
+                                              RandomStringUtils.random(lengthOfRandomDescription));
 
         boolean paidWithCreditCard = ThreadLocalRandom.current().nextBoolean();
         expenseRequest.setPaidWithCreditCard(paidWithCreditCard);
@@ -59,15 +63,17 @@ public class ExpenseRequestFactory {
     }
 
     public static ExpenseRequest getExpenseRequest(LocalDate date,
-            BigDecimal amount,
-            List<String> tags,
-            String description,
-            boolean paidWithCreditCard,
-            boolean creditCardStatementIssued) {
+                                                   BigDecimal amount,
+                                                   List<String> tags,
+                                                   String description,
+                                                   boolean paidWithCreditCard,
+                                                   boolean creditCardStatementIssued) {
         ExpenseRequest expenseRequest = new ExpenseRequest();
         expenseRequest.setDate(date);
         expenseRequest.setAmount(amount);
-        expenseRequest.setTags(tags);
+        expenseRequest.setTags(tags.stream()
+                                       .map(tag -> new Tag().value(tag))
+                                       .collect(Collectors.toList()));
         expenseRequest.setDescription(description);
         expenseRequest.setPaidWithCreditCard(paidWithCreditCard);
         expenseRequest.setCreditCardStatementIssued(creditCardStatementIssued);

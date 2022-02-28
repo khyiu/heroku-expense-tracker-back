@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -15,6 +16,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -59,21 +62,26 @@ public class Expense {
     @Column(name = "creditCardStatementIssued")
     private Boolean creditCardStatementIssued;
 
-    @ElementCollection
-    @CollectionTable(schema = "het", name = "expense_tag", joinColumns = @JoinColumn(name = "expense_id", referencedColumnName = "id"))
-    @Column(name = "value")
-    private Set<String> tags = new TreeSet<>();
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(schema = "het", name = "expense_tag",
+            joinColumns = @JoinColumn(name = "expense_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    private Set<Tag> tags = new TreeSet<>();
 
     @Column(name = "\"order\"")
     private Integer order;
 
-    public void setTags(@NonNull Set<String> tags) {
+    public void setTags(@NonNull Set<Tag> tags) {
         this.tags.clear();
         this.tags.addAll(tags);
     }
 
-    public Set<String> getTags() {
+    public Set<Tag> getTags() {
         return Collections.unmodifiableSet(this.tags);
+    }
+
+    public void addTag(@NonNull Tag tag) {
+        this.tags.add(tag);
     }
 
     @Override
@@ -99,5 +107,21 @@ public class Expense {
     @Override
     public int hashCode() {
         return Objects.hash(owner, date, amount, description, paidWithCreditCard, creditCardStatementIssued, tags);
+    }
+
+    @Override
+    public String toString() {
+        return "Expense{" +
+                "id=" + id +
+                ", owner='" + owner + '\'' +
+                ", version=" + version +
+                ", date=" + date +
+                ", amount=" + amount +
+                ", description='" + description + '\'' +
+                ", paidWithCreditCard=" + paidWithCreditCard +
+                ", creditCardStatementIssued=" + creditCardStatementIssued +
+                ", tags=" + tags +
+                ", order=" + order +
+                '}';
     }
 }

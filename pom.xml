@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>be.kuritsu</groupId>
 	<artifactId>heroku-expense-tracker-back</artifactId>
-	<version>2.0.0-SNAPSHOT</version>
+	<version>2.1.0-SNAPSHOT</version>
 	<name>heroku-expense-tracker-back</name>
 	<description>Hobby project to explore Heroku</description>
 
@@ -31,7 +31,7 @@
 
 		<keycloak.version>13.0.0</keycloak.version>
 
-		<api.version>200761bc4afdf5a9c2028159d10cace68295f408</api.version>
+		<api.version>ccf3d45c8ca8db71b778904619aad58f0314fc59</api.version>
 
 		<cucumber.version>6.11.0</cucumber.version>
 		<org.mapstruct.version>1.4.2.Final</org.mapstruct.version>

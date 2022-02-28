@@ -1,5 +1,10 @@
 package be.kuritsu.hetb.service;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -16,12 +21,15 @@ import org.springframework.stereotype.Service;
 import be.kuritsu.het.model.ExpenseListResponse;
 import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.het.model.ExpenseResponse;
+import be.kuritsu.het.model.Tag;
 import be.kuritsu.hetb.caching.CacheNames;
 import be.kuritsu.hetb.domain.Expense;
 import be.kuritsu.hetb.mapper.ExpenseMapper;
+import be.kuritsu.hetb.mapper.TagMapper;
 import be.kuritsu.hetb.repository.ExpenseRepository;
 import be.kuritsu.hetb.repository.ExpenseSequenceRepository;
 import be.kuritsu.hetb.repository.ExpenseSpecifications;
+import be.kuritsu.hetb.repository.TagRepository;
 import be.kuritsu.hetb.security.SecurityContextService;
 
 @Service
@@ -32,31 +40,48 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final ExpenseSequenceRepository expenseSequenceRepository;
     private final ExpenseMapper expenseMapper;
+    private final TagRepository tagRepository;
+    private final TagMapper tagMapper;
 
     @Autowired
     public ExpenseServiceImpl(ExpenseRepository expenseRepository,
-            ExpenseSequenceRepository expenseSequenceRepository,
-            ExpenseMapper expenseMapper,
-            SecurityContextService securityContextService) {
+                              ExpenseSequenceRepository expenseSequenceRepository,
+                              ExpenseMapper expenseMapper,
+                              SecurityContextService securityContextService,
+                              TagRepository tagRepository,
+                              TagMapper tagMapper) {
         this.expenseRepository = expenseRepository;
         this.expenseSequenceRepository = expenseSequenceRepository;
         this.expenseMapper = expenseMapper;
         this.securityContextService = securityContextService;
+        this.tagRepository = tagRepository;
+        this.tagMapper = tagMapper;
     }
 
     @CacheEvict(value = CacheNames.USER_BALANCE_CACHE, key = "@securityContextService.getAuthenticatedUserName()")
     @Override
     public ExpenseResponse registerExpense(ExpenseRequest expenseRequest) {
-        Expense expense = expenseMapper.expenseRequestToRequest(expenseRequest);
+        Set<UUID> existingTagIds = expenseRequest.getTags().stream()
+                .map(Tag::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        List<be.kuritsu.hetb.domain.Tag> existingTags = tagRepository.findAllById(existingTagIds);
 
+        Expense expense = expenseMapper.expenseRequestToRequest(expenseRequest);
         String owner = securityContextService.getAuthenticatedUserName();
         expense.setOwner(owner);
         expense.setOrder(expenseSequenceRepository.getNextOrderSequenceValue());
         expense.setDescription(StringUtils.stripAccents(expense.getDescription()));
-        expense.setTags(expense.getTags()
-                .stream()
-                .map(StringUtils::stripAccents)
-                .collect(Collectors.toSet()));
+        expense.setTags(new HashSet<>(existingTags));
+
+        expenseRequest.getTags().stream()
+                .filter(tag -> tag.getId() == null)
+                .map(tagMapper::expenseRequestToRequest)
+                .forEach(tag -> {
+                    tag.setOwner(owner);
+                    tag.setExpenses(Collections.singletonList(expense));
+                    expense.addTag(tag);
+                });
 
         expenseRepository.save(expense);
         return expenseMapper.expenseToExpenseResponse(expense);
@@ -79,10 +104,11 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         existingExpense.setDate(expenseRequest.getDate());
         existingExpense.setAmount(expenseRequest.getAmount());
-        existingExpense.setTags(expenseRequest.getTags()
-                .stream()
-                .map(StringUtils::stripAccents)
-                .collect(Collectors.toSet()));
+//        existingExpense.setTags(expenseRequest.getTags()
+//                                        .stream()
+//                                        .map(StringUtils::stripAccents)
+//                                        .collect(Collectors.toSet()));
+        // todo kyiu: update implementation
         existingExpense.setDescription(StringUtils.stripAccents(expenseRequest.getDescription()));
         existingExpense.setPaidWithCreditCard(expenseRequest.getPaidWithCreditCard());
         existingExpense.setCreditCardStatementIssued(expenseRequest.getCreditCardStatementIssued());
@@ -102,10 +128,10 @@ public class ExpenseServiceImpl implements ExpenseService {
         Sort.Direction sortDir = expenseListRequest.sortDirection() == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC;
 
         ExpenseSpecifications specs = new ExpenseSpecifications(securityContextService.getAuthenticatedUserName(),
-                expenseListRequest.tagFilters(),
-                expenseListRequest.descriptionFilter(),
-                expenseListRequest.paidWithCreditCardFilter(),
-                expenseListRequest.creditCardStatementIssuedFilter());
+                                                                expenseListRequest.tagFilters(),
+                                                                expenseListRequest.descriptionFilter(),
+                                                                expenseListRequest.paidWithCreditCardFilter(),
+                                                                expenseListRequest.creditCardStatementIssuedFilter());
         PageRequest pageRequest;
 
         if (expenseListRequest.sortBy() == SortBy.DATE) {
@@ -124,8 +150,8 @@ public class ExpenseServiceImpl implements ExpenseService {
         response.setPageSize(page.getSize());
         response.setTotalNumberOfItems(Math.toIntExact(page.getTotalElements()));
         response.setItems(page.get()
-                .map(expenseMapper::expenseToExpenseResponse)
-                .collect(Collectors.toList()));
+                                  .map(expenseMapper::expenseToExpenseResponse)
+                                  .collect(Collectors.toList()));
         return response;
     }
 }

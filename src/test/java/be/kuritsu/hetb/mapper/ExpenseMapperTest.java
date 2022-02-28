@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -12,6 +14,7 @@ import org.junit.Test;
 
 import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.het.model.ExpenseResponse;
+import be.kuritsu.het.model.Tag;
 import be.kuritsu.hetb.domain.Expense;
 
 public class ExpenseMapperTest {
@@ -29,7 +32,11 @@ public class ExpenseMapperTest {
         LocalDate expenseDate = LocalDate.of(2020, 12, 14);
         BigDecimal expenseAmount = BigDecimal.valueOf(123.45);
         String expenseDescription = "Some description";
-        String[] expenseTags = { "tag1", "tag2", "tag3" };
+        List<Tag> expenseTags = Arrays.asList(
+                new Tag().value("tag1"),
+                new Tag().value("tag2"),
+                new Tag().value("tag3")
+        );
 
         ExpenseRequest expenseRequest = new ExpenseRequest();
         expenseRequest.date(expenseDate);
@@ -37,7 +44,7 @@ public class ExpenseMapperTest {
         expenseRequest.setDescription(expenseDescription);
         expenseRequest.setPaidWithCreditCard(true);
         expenseRequest.setCreditCardStatementIssued(false);
-        expenseRequest.setTags(Arrays.asList(expenseTags));
+        expenseRequest.setTags(expenseTags);
 
         Expense expense = expenseMapper.expenseRequestToRequest(expenseRequest);
         assertThat(expense).isNotNull();
@@ -48,7 +55,11 @@ public class ExpenseMapperTest {
         assertThat(expense.getCreditCardStatementIssued()).isFalse();
         assertThat(expense.getTags())
                 .hasSize(3)
-                .contains(expenseTags);
+                .contains(
+                        be.kuritsu.hetb.domain.Tag.builder().value("tag1").build(),
+                        be.kuritsu.hetb.domain.Tag.builder().value("tag2").build(),
+                        be.kuritsu.hetb.domain.Tag.builder().value("tag3").build()
+                );
     }
 
     @Test
@@ -64,7 +75,10 @@ public class ExpenseMapperTest {
                 .id(UUID.randomUUID())
                 .date(date)
                 .amount(BigDecimal.valueOf(-746.22))
-                .tags(Set.of("voiture"))
+                .tags(Set.of(be.kuritsu.hetb.domain.Tag.builder()
+                                     .value("voiture")
+                                     .build())
+                )
                 .description("Entretien annuel - garage Beerens Zaventem")
                 .paidWithCreditCard(false)
                 .owner("test-user")
@@ -75,7 +89,7 @@ public class ExpenseMapperTest {
         assertThat(expenseResponse.getId()).isEqualTo(expense.getId().toString());
         assertThat(expenseResponse.getDate()).isEqualTo(expense.getDate());
         assertThat(expenseResponse.getAmount()).isEqualTo(expense.getAmount());
-        assertThat(expenseResponse.getTags()).containsExactlyElementsOf(expense.getTags());
+        assertThat(expenseResponse.getTags()).containsExactlyElementsOf(Collections.singletonList(new Tag().value("voiture")));
         assertThat(expenseResponse.getDescription()).isEqualTo(expense.getDescription());
         assertThat(expenseResponse.getPaidWithCreditCard()).isEqualTo(expense.getPaidWithCreditCard());
         assertThat(expenseResponse.getCreditCardStatementIssued()).isEqualTo(expense.getCreditCardStatementIssued());

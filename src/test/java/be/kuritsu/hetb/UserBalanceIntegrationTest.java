@@ -2,8 +2,6 @@ package be.kuritsu.hetb;
 
 import static org.mockito.Mockito.verify;
 
-import java.util.UUID;
-
 import org.junit.Test;
 import org.mockito.internal.verification.Times;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,14 +38,14 @@ public class UserBalanceIntegrationTest extends IntegrationTest {
         balanceService.getBalance();
         verify(balanceService, new Times(2)).getBalance();
 
-        expenseService.updateExpense(UUID.fromString(expenseResponse.getId()), expenseRequest);
+        expenseService.updateExpense(expenseResponse.getId(), expenseRequest);
         balanceService.getBalance();
         verify(balanceService, new Times(3)).getBalance();
 
         balanceService.getBalance();
         verify(balanceService, new Times(3)).getBalance();
 
-        expenseService.deleteExpense(UUID.fromString(expenseResponse.getId()));
+        expenseService.deleteExpense(expenseResponse.getId());
         balanceService.getBalance();
         verify(balanceService, new Times(4)).getBalance();
 
