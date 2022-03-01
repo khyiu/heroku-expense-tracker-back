@@ -1,6 +1,7 @@
 package be.kuritsu.hetb.domain;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -15,7 +16,9 @@ import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(schema = "het", name = "tag")
@@ -23,6 +26,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@EqualsAndHashCode(of = { "id" })
+@ToString(of = {"value", "owner"})
 public class Tag implements Comparable<Tag> {
 
     @GeneratedValue
@@ -38,21 +43,16 @@ public class Tag implements Comparable<Tag> {
     @ManyToMany(mappedBy = "tags")
     private List<Expense> expenses = new ArrayList<>();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Tag tag = (Tag) o;
-        return Objects.equals(value, tag.value) && Objects.equals(owner, tag.owner);
+    public List<Expense> getExpenses() {
+        return Collections.unmodifiableList(expenses);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(value, owner);
+    public void addExpense(Expense expense) {
+        expenses.add(expense);
+    }
+
+    public void removeExpense(Expense expense) {
+        expenses.remove(expense);
     }
 
     @Override

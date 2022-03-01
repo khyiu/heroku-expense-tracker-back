@@ -26,6 +26,7 @@ import org.springframework.lang.NonNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -34,6 +35,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@EqualsAndHashCode(of = { "id" })
 public class Expense {
 
     @GeneratedValue
@@ -77,36 +79,15 @@ public class Expense {
     }
 
     public Set<Tag> getTags() {
-        return Collections.unmodifiableSet(this.tags);
+        return Collections.unmodifiableSet(tags);
     }
 
     public void addTag(@NonNull Tag tag) {
-        this.tags.add(tag);
+        tags.add(tag);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Expense expense = (Expense) o;
-        return owner.equals(expense.owner)
-                && date.equals(expense.date)
-                && amount.equals(expense.amount)
-                && Objects.equals(description, expense.description)
-                && Objects.equals(paidWithCreditCard, expense.paidWithCreditCard)
-                && Objects.equals(creditCardStatementIssued, expense.creditCardStatementIssued)
-                && tags.equals(expense.tags);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(owner, date, amount, description, paidWithCreditCard, creditCardStatementIssued, tags);
+    public void removeTag(@NonNull Tag tag) {
+        tags.remove(tag);
     }
 
     @Override

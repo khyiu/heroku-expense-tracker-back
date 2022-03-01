@@ -1,5 +1,6 @@
 package be.kuritsu.hetb.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -11,6 +12,8 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
@@ -35,6 +38,7 @@ import be.kuritsu.hetb.security.SecurityContextService;
 @Service
 @Transactional
 public class ExpenseServiceImpl implements ExpenseService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExpenseServiceImpl.class);
 
     private final SecurityContextService securityContextService;
     private final ExpenseRepository expenseRepository;
@@ -76,7 +80,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         expenseRequest.getTags().stream()
                 .filter(tag -> tag.getId() == null)
-                .map(tagMapper::expenseRequestToRequest)
+                .map(tagMapper::tagToTagEntity)
                 .forEach(tag -> {
                     tag.setOwner(owner);
                     tag.setExpenses(Collections.singletonList(expense));
@@ -104,15 +108,60 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         existingExpense.setDate(expenseRequest.getDate());
         existingExpense.setAmount(expenseRequest.getAmount());
-//        existingExpense.setTags(expenseRequest.getTags()
-//                                        .stream()
-//                                        .map(StringUtils::stripAccents)
-//                                        .collect(Collectors.toSet()));
-        // todo kyiu: update implementation
         existingExpense.setDescription(StringUtils.stripAccents(expenseRequest.getDescription()));
         existingExpense.setPaidWithCreditCard(expenseRequest.getPaidWithCreditCard());
         existingExpense.setCreditCardStatementIssued(expenseRequest.getCreditCardStatementIssued());
+        updateExpenseTags(existingExpense, expenseRequest.getTags());
+
         return expenseMapper.expenseToExpenseResponse(existingExpense);
+    }
+
+    private void updateExpenseTags(Expense expense, List<Tag> tagsFromRequest) {
+        // todo kyiu: update tags
+        List<UUID> tagIdsFromRequest = new ArrayList<>();
+        List<Tag> newTagsFromRequest = new ArrayList<>();
+
+        tagsFromRequest.forEach(tagFromRequest -> {
+            if (tagFromRequest.getId() == null) {
+                newTagsFromRequest.add(tagFromRequest);
+            } else {
+                tagIdsFromRequest.add(tagFromRequest.getId());
+            }
+        });
+
+        List<be.kuritsu.hetb.domain.Tag> tagEntitiesFromRequest = tagRepository.findAllById(tagIdsFromRequest);
+
+        // tags to remove
+        List<be.kuritsu.hetb.domain.Tag> tagEntitiesToRemove = expense.getTags().stream()
+                .filter(tagEntity -> !tagEntitiesFromRequest.contains(tagEntity))
+                .collect(Collectors.toList());
+        tagEntitiesToRemove.forEach(tagEntityToRemove -> {
+            expense.removeTag(tagEntityToRemove);
+            tagEntityToRemove.removeExpense(expense);
+
+            if (tagEntityToRemove.getExpenses().isEmpty()) {
+                tagRepository.delete(tagEntityToRemove);
+                LOGGER.debug("Deleting tag - {} - because no expense is linked to it anymore", tagEntityToRemove);
+            }
+        });
+
+        // tags to add
+        List<be.kuritsu.hetb.domain.Tag> tagEntitiesToAdd = tagEntitiesFromRequest.stream()
+                .filter(tagEntityFromRequest -> !expense.getTags().contains(tagEntityFromRequest))
+                .collect(Collectors.toList());
+        tagEntitiesToAdd.forEach(tagEntityToAdd -> {
+            expense.addTag(tagEntityToAdd);
+            tagEntityToAdd.addExpense(expense);
+        });
+
+        // tags to create
+        newTagsFromRequest.stream()
+                .map(tagMapper::tagToTagEntity)
+                .forEach(newTagEntity -> {
+                    newTagEntity.setOwner(securityContextService.getAuthenticatedUserName());
+                    expense.addTag(newTagEntity);
+                    newTagEntity.setExpenses(Collections.singletonList(expense));
+                });
     }
 
     @CacheEvict(value = CacheNames.USER_BALANCE_CACHE, key = "@securityContextService.getAuthenticatedUserName()")
