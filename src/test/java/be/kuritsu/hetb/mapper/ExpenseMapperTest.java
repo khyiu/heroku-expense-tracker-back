@@ -19,7 +19,7 @@ import be.kuritsu.hetb.domain.Expense;
 
 public class ExpenseMapperTest {
 
-    private final ExpenseMapper expenseMapper = new ExpenseMapperImpl();
+    private final ExpenseMapper expenseMapper = new ExpenseMapperImpl(new TagMapperImpl());
 
     @Test
     public void test_expense_request_to_request_null_input() {
@@ -86,7 +86,7 @@ public class ExpenseMapperTest {
                 .build();
 
         ExpenseResponse expenseResponse = expenseMapper.expenseToExpenseResponse(expense);
-        assertThat(expenseResponse.getId()).isEqualTo(expense.getId().toString());
+        assertThat(expenseResponse.getId()).isEqualTo(expense.getId());
         assertThat(expenseResponse.getDate()).isEqualTo(expense.getDate());
         assertThat(expenseResponse.getAmount()).isEqualTo(expense.getAmount());
         assertThat(expenseResponse.getTags()).containsExactlyElementsOf(Collections.singletonList(new Tag().value("voiture")));
