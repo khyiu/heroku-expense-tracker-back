@@ -10,6 +10,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
+import be.kuritsu.het.model.Tag;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +25,7 @@ public class CucumberState {
     private String currentUsername;
     private Map<String, MvcResult> currentUserResults = new HashMap<>();
     private Map<String, MvcResult> userLastCreatedExpenseResults = new HashMap<>();
+    private Map<String, Map<String, Tag>> userTags = new HashMap<>();
 
     public void setCurrentMvcResult(MvcResult currentMvcResult) {
         if (this.currentUsername != null) {

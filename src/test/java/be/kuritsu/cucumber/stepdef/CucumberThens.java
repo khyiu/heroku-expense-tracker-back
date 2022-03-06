@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import be.kuritsu.cucumber.CucumberState;
 import be.kuritsu.het.model.ExpenseListResponse;
 import be.kuritsu.het.model.ExpenseResponse;
+import be.kuritsu.het.model.Tag;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -56,19 +58,22 @@ public class CucumberThens extends CucumberStepDefinitions {
 
     @Then("he receives the persisted expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {} and {}")
     public void assertPersistedExpense(LocalDate date,
-            BigDecimal amount,
-            List<String> tags,
-            String description,
-            Boolean paidWithCreditCard,
-            Boolean creditCardStatementIssued) throws UnsupportedEncodingException, JsonProcessingException {
+                                       BigDecimal amount,
+                                       List<String> tags,
+                                       String description,
+                                       Boolean paidWithCreditCard,
+                                       Boolean creditCardStatementIssued) throws UnsupportedEncodingException, JsonProcessingException {
 
         ExpenseResponse expenseResponse = objectMapper.readValue(state.getCurrentMvcResult().getResponse().getContentAsString(), ExpenseResponse.class);
         assertThat(expenseResponse.getId()).isNotNull();
         assertThat(expenseResponse.getVersion()).isNotNull();
         assertThat(expenseResponse.getDate()).isEqualTo(date);
         assertThat(expenseResponse.getAmount()).isEqualByComparingTo(amount);
-        // todo kyiu: fix
-//        assertThat(expenseResponse.getTags()).containsExactlyElementsOf(tags);
+        assertThat(expenseResponse.getTags()
+                           .stream()
+                           .map(Tag::getValue)
+                           .collect(Collectors.toList()))
+                .containsExactlyElementsOf(tags);
         assertThat(expenseResponse.getDescription()).isEqualTo(description);
         assertThat(expenseResponse.getPaidWithCreditCard()).isEqualTo(paidWithCreditCard);
         assertThat(expenseResponse.getCreditCardStatementIssued()).isEqualTo(creditCardStatementIssued);
@@ -82,20 +87,23 @@ public class CucumberThens extends CucumberStepDefinitions {
 
     @Then("he receives a list of expenses containing at index {int} an expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {} and {}")
     public void assertExpenseFromDashboard(int index,
-            LocalDate date,
-            BigDecimal amount,
-            List<String> tags,
-            String description,
-            Boolean paidWithCreditCard,
-            Boolean creditCardStatementIssued) throws Exception {
+                                           LocalDate date,
+                                           BigDecimal amount,
+                                           List<String> tags,
+                                           String description,
+                                           Boolean paidWithCreditCard,
+                                           Boolean creditCardStatementIssued) throws Exception {
         ExpenseListResponse expenseListResponse = objectMapper.readValue(state.getCurrentMvcResult().getResponse().getContentAsString(), ExpenseListResponse.class);
         ExpenseResponse expenseResponse = expenseListResponse.getItems().get(index);
         assertThat(expenseResponse.getId()).isNotNull();
         assertThat(expenseResponse.getVersion()).isNotNull();
         assertThat(expenseResponse.getDate()).isEqualTo(date);
         assertThat(expenseResponse.getAmount()).isEqualByComparingTo(amount);
-        // todo kyiu: fix
-//        assertThat(expenseResponse.getTags()).containsExactlyElementsOf(tags);
+        assertThat(expenseResponse.getTags()
+                           .stream()
+                           .map(Tag::getValue)
+                           .collect(Collectors.toList()))
+                .containsExactlyElementsOf(tags);
         assertThat(expenseResponse.getDescription()).isEqualTo(description);
         assertThat(expenseResponse.getPaidWithCreditCard()).isEqualTo(paidWithCreditCard);
         assertThat(expenseResponse.getCreditCardStatementIssued()).isEqualTo(creditCardStatementIssued);

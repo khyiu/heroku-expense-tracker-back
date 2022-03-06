@@ -5,8 +5,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -18,6 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import be.kuritsu.cucumber.CucumberState;
 import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.het.model.ExpenseResponse;
+import be.kuritsu.het.model.Tag;
 import be.kuritsu.testutil.ExpenseRequestFactory;
 
 import io.cucumber.java.Before;
@@ -43,21 +47,48 @@ public class CucumberWhens extends CucumberStepDefinitions {
         }
     }
 
-    @When("he sends a request to register any expense")
-    public void register_any_expense() throws Exception {
+    private void sendCreateExpenseRequest(ExpenseRequest expenseRequest) throws Exception {
         MockHttpServletRequestBuilder requestBuilder = post("/expenses");
 
         if (state.getCurrentUserRequestPostProcessor() != null) {
             requestBuilder.with(state.getCurrentUserRequestPostProcessor());
         }
 
-        ExpenseRequest expenseRequest = ExpenseRequestFactory.getRandomValidExpenseRequest();
+        // replace specified tags with their persisted version when they exist
+        Map<String, Tag> persistedTags = state.getUserTags().computeIfAbsent(state.getCurrentUsername(), (key) -> new HashMap<>());
+
+        if (!persistedTags.isEmpty()) {
+            List<Tag> persistedTagsWhenAvailable = expenseRequest.getTags()
+                    .stream()
+                    .map(tag -> persistedTags.getOrDefault(tag.getValue(), tag))
+                    .collect(Collectors.toList());
+
+            expenseRequest.setTags(persistedTagsWhenAvailable);
+        }
+
         requestBuilder.contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(expenseRequest));
 
-        state.setCurrentMvcResult(state.getMockMvc()
+        MvcResult currentMvcResult = state.getMockMvc()
                 .perform(requestBuilder)
-                .andReturn());
+                .andReturn();
+        state.setCurrentMvcResult(currentMvcResult);
+
+        // extract tags from response and set them to current state4
+        boolean responseStatusIs2XX = Integer.toString(currentMvcResult.getResponse().getStatus()).startsWith("2");
+
+        if (responseStatusIs2XX) {
+            ExpenseResponse expenseResponse = objectMapper.readValue(currentMvcResult.getResponse().getContentAsString(), ExpenseResponse.class);
+            for (Tag persistedTag : expenseResponse.getTags()) {
+                persistedTags.put(persistedTag.getValue(), persistedTag);
+            }
+        }
+    }
+
+    @When("he sends a request to register any expense")
+    public void register_any_expense() throws Exception {
+        ExpenseRequest expenseRequest = ExpenseRequestFactory.getRandomValidExpenseRequest();
+        sendCreateExpenseRequest(expenseRequest);
     }
 
     @When("he sends a request to edit something in the expense with id={string}")
@@ -73,8 +104,8 @@ public class CucumberWhens extends CucumberStepDefinitions {
                 .content(objectMapper.writeValueAsString(expenseRequest));
 
         state.setCurrentMvcResult(state.getMockMvc()
-                .perform(requestBuilder)
-                .andReturn());
+                                          .perform(requestBuilder)
+                                          .andReturn());
     }
 
     @When("he sends a request to delete the expense with id={string}")
@@ -86,8 +117,8 @@ public class CucumberWhens extends CucumberStepDefinitions {
         }
 
         state.setCurrentMvcResult(state.getMockMvc()
-                .perform(requestBuilder)
-                .andReturn());
+                                          .perform(requestBuilder)
+                                          .andReturn());
     }
 
     @When("he sends a request to delete the last expense created by {string}")
@@ -100,48 +131,25 @@ public class CucumberWhens extends CucumberStepDefinitions {
         }
 
         state.setCurrentMvcResult(state.getMockMvc()
-                .perform(requestBuilder)
-                .andReturn());
+                                          .perform(requestBuilder)
+                                          .andReturn());
     }
 
     @When("he sends a request to register an expense with {nullableDate}, {nullableAmount}, {nullableStringList} and {int}")
     public void register_a_parameterized_expense(LocalDate date, BigDecimal amount, List<String> tags, int randomDescriptionLength) throws Exception {
-        MockHttpServletRequestBuilder requestBuilder = post("/expenses");
-
-        if (state.getCurrentUserRequestPostProcessor() != null) {
-            requestBuilder.with(state.getCurrentUserRequestPostProcessor());
-        }
-
         ExpenseRequest expenseRequest = ExpenseRequestFactory.getExpenseRequest(date, amount, tags, randomDescriptionLength);
-        requestBuilder.contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(expenseRequest));
-
-        state.setCurrentMvcResult(state.getMockMvc()
-                .perform(requestBuilder)
-                .andReturn());
+        sendCreateExpenseRequest(expenseRequest);
     }
 
     @When("he sends a request to register an expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {} and {}")
     public void register_a_parameterized_expense(LocalDate date,
-            BigDecimal amount,
-            List<String> tags,
-            String description,
-            Boolean paidWithCreditCard,
-            Boolean creditCardStatementIssued) throws Exception {
+                                                 BigDecimal amount,
+                                                 List<String> tags,
+                                                 String description,
+                                                 Boolean paidWithCreditCard,
+                                                 Boolean creditCardStatementIssued) throws Exception {
         ExpenseRequest expenseRequest = ExpenseRequestFactory.getExpenseRequest(date, amount, tags, description, paidWithCreditCard, creditCardStatementIssued);
-
-        MockHttpServletRequestBuilder requestBuilder = post("/expenses");
-
-        if (state.getCurrentUserRequestPostProcessor() != null) {
-            requestBuilder.with(state.getCurrentUserRequestPostProcessor());
-        }
-
-        requestBuilder.contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(expenseRequest));
-
-        state.setCurrentMvcResult(state.getMockMvc()
-                .perform(requestBuilder)
-                .andReturn());
+        sendCreateExpenseRequest(expenseRequest);
     }
 
     @When("he sends a request to retrieve any expense")
@@ -153,8 +161,8 @@ public class CucumberWhens extends CucumberStepDefinitions {
         }
 
         state.setCurrentMvcResult(state.getMockMvc()
-                .perform(requestBuilder)
-                .andReturn());
+                                          .perform(requestBuilder)
+                                          .andReturn());
     }
 
     @When("he sends a request to retrieve the last expense created by {string}")
@@ -170,18 +178,18 @@ public class CucumberWhens extends CucumberStepDefinitions {
         }
 
         state.setCurrentMvcResult(state.getMockMvc()
-                .perform(requestBuilder)
-                .andReturn());
+                                          .perform(requestBuilder)
+                                          .andReturn());
     }
 
     @When("he sends a request to edit the last expense created by {string} with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {} and {}")
     public void register_a_parameterized_expense(String username,
-            LocalDate date,
-            BigDecimal amount,
-            List<String> tags,
-            String description,
-            Boolean paidWithCreditCard,
-            Boolean creditCardStatementIssued) throws Exception {
+                                                 LocalDate date,
+                                                 BigDecimal amount,
+                                                 List<String> tags,
+                                                 String description,
+                                                 Boolean paidWithCreditCard,
+                                                 Boolean creditCardStatementIssued) throws Exception {
         ExpenseResponse expenseResponse = objectMapper.readValue(state.getCurrentUserResults().get(username).getResponse().getContentAsString(), ExpenseResponse.class);
         MockHttpServletRequestBuilder requestBuilder = put("/expense/{expenseId}", expenseResponse.getId());
 
@@ -193,8 +201,11 @@ public class CucumberWhens extends CucumberStepDefinitions {
                 .version(expenseResponse.getVersion())
                 .date(date)
                 .amount(amount)
-                // todo kyiu: fix
-//                .tags(tags)
+                .tags(
+                        tags.stream()
+                                .map(tagValue -> new Tag().value(tagValue))
+                                .collect(Collectors.toList())
+                )
                 .description(description)
                 .paidWithCreditCard(paidWithCreditCard)
                 .creditCardStatementIssued(creditCardStatementIssued);
@@ -203,8 +214,8 @@ public class CucumberWhens extends CucumberStepDefinitions {
                 .content(objectMapper.writeValueAsString(expenseRequestUpdate));
 
         state.setCurrentMvcResult(state.getMockMvc()
-                .perform(requestBuilder)
-                .andReturn());
+                                          .perform(requestBuilder)
+                                          .andReturn());
     }
 
     @When("he sends a request to retrieve his expenses with page number={int}, "
@@ -233,8 +244,8 @@ public class CucumberWhens extends CucumberStepDefinitions {
         }
 
         state.setCurrentMvcResult(state.getMockMvc()
-                .perform(requestBuilder)
-                .andReturn());
+                                          .perform(requestBuilder)
+                                          .andReturn());
     }
 
     @When("he sends a request to retrieve his expenses balance")
@@ -246,7 +257,7 @@ public class CucumberWhens extends CucumberStepDefinitions {
         }
 
         state.setCurrentMvcResult(state.getMockMvc()
-                .perform(requestBuilder)
-                .andReturn());
+                                          .perform(requestBuilder)
+                                          .andReturn());
     }
 }

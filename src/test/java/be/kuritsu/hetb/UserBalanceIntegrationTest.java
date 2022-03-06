@@ -38,6 +38,7 @@ public class UserBalanceIntegrationTest extends IntegrationTest {
         balanceService.getBalance();
         verify(balanceService, new Times(2)).getBalance();
 
+        expenseRequest.setTags(expenseResponse.getTags());
         expenseService.updateExpense(expenseResponse.getId(), expenseRequest);
         balanceService.getBalance();
         verify(balanceService, new Times(3)).getBalance();

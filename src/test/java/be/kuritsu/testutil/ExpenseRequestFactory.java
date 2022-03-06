@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.lang.Nullable;
 
 import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.het.model.Tag;
@@ -41,11 +42,11 @@ public class ExpenseRequestFactory {
         return expenseRequest;
     }
 
-    public static ExpenseRequest getExpenseRequest(LocalDate date, BigDecimal amount, List<String> tags, int lengthOfRandomDescription) {
+    public static ExpenseRequest getExpenseRequest(LocalDate date, BigDecimal amount, @Nullable List<String> tags, int lengthOfRandomDescription) {
         ExpenseRequest expenseRequest = new ExpenseRequest();
         expenseRequest.setDate(date);
         expenseRequest.setAmount(amount);
-        expenseRequest.setTags(tags.stream()
+        expenseRequest.setTags(tags == null ? Collections.emptyList() : tags.stream()
                                        .map(tag -> new Tag().value(tag))
                                        .collect(Collectors.toList()));
         expenseRequest.setDescription(lengthOfRandomDescription == 0 ?
