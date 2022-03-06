@@ -9,4 +9,6 @@ import be.kuritsu.hetb.domain.Tag;
 public interface TagMapper {
 
     Tag tagToTagEntity(be.kuritsu.het.model.Tag tag);
+
+    be.kuritsu.het.model.Tag tagEntityToTag(Tag tag);
 }

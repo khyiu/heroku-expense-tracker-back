@@ -9,7 +9,7 @@ import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.het.model.ExpenseResponse;
 import be.kuritsu.hetb.domain.Expense;
 
-@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR, uses = TagMapper.class)
 public interface ExpenseMapper {
 
     Expense expenseRequestToRequest(ExpenseRequest expenseRequest);

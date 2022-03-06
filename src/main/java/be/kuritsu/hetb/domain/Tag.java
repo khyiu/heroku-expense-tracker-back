@@ -26,7 +26,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@EqualsAndHashCode(of = { "id" })
 @ToString(of = {"value", "owner"})
 public class Tag implements Comparable<Tag> {
 
@@ -53,6 +52,23 @@ public class Tag implements Comparable<Tag> {
 
     public void removeExpense(Expense expense) {
         expenses.remove(expense);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Tag tag = (Tag) o;
+        return Objects.equals(id, tag.id) && value.equals(tag.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, value);
     }
 
     @Override

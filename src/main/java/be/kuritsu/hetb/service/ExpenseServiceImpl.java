@@ -117,7 +117,6 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     private void updateExpenseTags(Expense expense, List<Tag> tagsFromRequest) {
-        // todo kyiu: update tags
         List<UUID> tagIdsFromRequest = new ArrayList<>();
         List<Tag> newTagsFromRequest = new ArrayList<>();
 
