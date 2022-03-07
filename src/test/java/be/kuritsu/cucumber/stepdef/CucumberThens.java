@@ -114,4 +114,19 @@ public class CucumberThens extends CucumberStepDefinitions {
         BigDecimal fetchedBalance = objectMapper.readValue(state.getCurrentMvcResult().getResponse().getContentAsString(), BigDecimal.class);
         assertThat(fetchedBalance).isEqualByComparingTo(balance);
     }
+
+    @Then("he receives a list of tags that contains {nullableStringList}")
+    public void assertTags(List<String> expectedTags) throws Exception {
+        List<Tag> tags = objectMapper.readValue(state.getCurrentMvcResult().getResponse().getContentAsString(), new TypeReference<List<Tag>>() {
+        });
+
+        assertThat(tags).hasSize(expectedTags.size());
+
+        for (String expectedTag : expectedTags) {
+            assertThat(tags).anySatisfy(tag -> {
+                assertThat(tag.getId()).isNotNull();
+                assertThat(tag.getValue()).isEqualTo(expectedTag);
+            });
+        }
+    }
 }

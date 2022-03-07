@@ -18,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -64,6 +65,7 @@ public class Expense {
     @Column(name = "creditCardStatementIssued")
     private Boolean creditCardStatementIssued;
 
+    @OrderBy("value ASC")
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(schema = "het", name = "expense_tag",
             joinColumns = @JoinColumn(name = "expense_id"),

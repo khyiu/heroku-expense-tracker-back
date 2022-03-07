@@ -167,7 +167,15 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public void deleteExpense(UUID expenseId) {
         Expense expense = expenseRepository.getById(expenseId);
+        List<be.kuritsu.hetb.domain.Tag> tagsWithNoLinkedExpenseAfterDeletion = expense.getTags()
+                .stream()
+                .filter(tag -> tag.getExpenses().size() == 1)
+                .collect(Collectors.toList());
         expenseRepository.delete(expense);
+
+        if (!tagsWithNoLinkedExpenseAfterDeletion.isEmpty()) {
+            tagRepository.deleteAll(tagsWithNoLinkedExpenseAfterDeletion);
+        }
     }
 
     @Override

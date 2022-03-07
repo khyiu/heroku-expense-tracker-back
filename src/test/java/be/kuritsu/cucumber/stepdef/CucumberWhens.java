@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.lang.Nullable;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -254,6 +255,23 @@ public class CucumberWhens extends CucumberStepDefinitions {
 
         if (state.getCurrentUserRequestPostProcessor() != null) {
             requestBuilder.with(state.getCurrentUserRequestPostProcessor());
+        }
+
+        state.setCurrentMvcResult(state.getMockMvc()
+                                          .perform(requestBuilder)
+                                          .andReturn());
+    }
+
+    @When("he sends a request to retrieve his tags with query {nullableString}")
+    public void retrieve_tags(@Nullable String query) throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = get("/tags");
+
+        if (state.getCurrentUserRequestPostProcessor() != null) {
+            requestBuilder.with(state.getCurrentUserRequestPostProcessor());
+        }
+
+        if (query != null) {
+            requestBuilder.queryParam("query", query);
         }
 
         state.setCurrentMvcResult(state.getMockMvc()
