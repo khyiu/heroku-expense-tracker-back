@@ -14,10 +14,12 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.MimeType;
 
 import be.kuritsu.cucumber.CucumberState;
 import be.kuritsu.het.model.ExpenseRequest;
@@ -272,6 +274,20 @@ public class CucumberWhens extends CucumberStepDefinitions {
 
         if (query != null) {
             requestBuilder.queryParam("query", query);
+        }
+
+        state.setCurrentMvcResult(state.getMockMvc()
+                                          .perform(requestBuilder)
+                                          .andReturn());
+    }
+
+    @When("he uploads expense import file {string}")
+    public void upload_expense_import_file(String filename) throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = multipart("/expenses/import")
+                .file(new MockMultipartFile("file", filename, String.valueOf(MimeType.valueOf("text/csv")), getClass().getResourceAsStream("/expense-imports/" + filename)));
+
+        if (state.getCurrentUserRequestPostProcessor() != null) {
+            requestBuilder.with(state.getCurrentUserRequestPostProcessor());
         }
 
         state.setCurrentMvcResult(state.getMockMvc()

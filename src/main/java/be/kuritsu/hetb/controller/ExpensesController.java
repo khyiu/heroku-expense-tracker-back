@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import be.kuritsu.het.api.ExpenseApi;
 import be.kuritsu.het.api.ExpensesApi;
@@ -74,5 +75,11 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
                 .creditCardStatementIssuedFilter(creditCardStatementIssuedFilter);
 
         return ResponseEntity.ok(expenseService.getExpenses(expenseListRequest));
+    }
+
+    @Override
+    public ResponseEntity<Void> importExpenses(MultipartFile file) {
+        // todo kyiu
+        return null;
     }
 }
