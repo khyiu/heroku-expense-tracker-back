@@ -9,7 +9,7 @@ Feature: Import expenses
   Scenario: an authenticated user with insufficient permissions imports some expenses
     Given an authenticated user, "Bill", with role "EXPENSE-TRACKER-TEST-USER"
     When he uploads expense import file "import-01.csv"
-    Then he gets a response with status 401
+    Then he gets a response with status 403
 
   Scenario: an authenticated user with sufficient permissions imports some expenses
     Given an authenticated user, "Aaron", with role "EXPENSE-TRACKER-USER"

@@ -77,6 +77,7 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
         return ResponseEntity.ok(expenseService.getExpenses(expenseListRequest));
     }
 
+    @Secured(ROLE_EXPENSE_TRACKER_USER)
     @Override
     public ResponseEntity<Void> importExpenses(MultipartFile file) {
         // todo kyiu
