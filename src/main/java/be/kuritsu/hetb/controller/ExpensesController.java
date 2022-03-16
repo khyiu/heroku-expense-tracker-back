@@ -2,6 +2,7 @@ package be.kuritsu.hetb.controller;
 
 import static be.kuritsu.hetb.config.SecurityConfig.ROLE_EXPENSE_TRACKER_USER;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,16 +18,19 @@ import be.kuritsu.het.api.ExpensesApi;
 import be.kuritsu.het.model.ExpenseListResponse;
 import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.het.model.ExpenseResponse;
+import be.kuritsu.hetb.service.ExpenseImportService;
 import be.kuritsu.hetb.service.ExpenseService;
 
 @RestController
 public class ExpensesController implements ExpensesApi, ExpenseApi {
 
     private final ExpenseService expenseService;
+    private final ExpenseImportService expenseImportService;
 
     @Autowired
-    public ExpensesController(ExpenseService expenseService) {
+    public ExpensesController(ExpenseService expenseService, ExpenseImportService expenseImportService) {
         this.expenseService = expenseService;
+        this.expenseImportService = expenseImportService;
     }
 
     @Secured(ROLE_EXPENSE_TRACKER_USER)
@@ -80,7 +84,11 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
     @Secured(ROLE_EXPENSE_TRACKER_USER)
     @Override
     public ResponseEntity<Void> importExpenses(MultipartFile file) {
-        // todo kyiu
-        return null;
+        try {
+            expenseImportService.importExpenses(file.getInputStream());
+            return ResponseEntity.ok().build();
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
