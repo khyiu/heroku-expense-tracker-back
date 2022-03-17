@@ -59,4 +59,8 @@
 		</createIndex>
 
 	</changeSet>
+
+	<changeSet id="add_non_null_constraint_on_tag_value" author="kyiu">
+		<addNotNullConstraint schemaName="het" tableName="tag" columnName="value"/>
+	</changeSet>
 </databaseChangeLog>

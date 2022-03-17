@@ -15,6 +15,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +97,7 @@ public class ExpenseImportServiceImpl implements ExpenseImportService {
 
         String expenseTag = expenseMatcher.group("tag");
 
-        Tag tag = tagRepository.findByValueAndOwner(expenseTag, owner)
+        Tag tag = tagRepository.findByValueAndOwner(StringUtils.stripAccents(expenseTag), owner)
                 .map(tagFromDB -> new Tag()
                         .id(tagFromDB.getId())
                         .value(tagFromDB.getValue()))
