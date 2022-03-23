@@ -3,7 +3,6 @@ package be.kuritsu.hetb.controller;
 import static be.kuritsu.hetb.config.SecurityConfig.ROLE_EXPENSE_TRACKER_USER;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +32,7 @@ public class TagController implements TagsApi {
         List<be.kuritsu.hetb.domain.Tag> tags = tagService.findTags(query);
         List<Tag> queriedTags = tags.stream()
                 .map(tagMapper::tagEntityToTag)
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(queriedTags);
     }
 }

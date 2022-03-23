@@ -86,13 +86,13 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
             SimpleKeycloakAccount keycloakAccount = (SimpleKeycloakAccount) token.getDetails();
             RefreshableKeycloakSecurityContext keycloakSecurityContext = keycloakAccount.getKeycloakSecurityContext();
-            List<GrantedAuthority> grantedAuthorities = keycloakSecurityContext
+            List<KeycloakRole> grantedAuthorities = keycloakSecurityContext
                     .getToken()
                     .getRealmAccess()
                     .getRoles()
                     .stream()
                     .map(keycloakRole -> new KeycloakRole("ROLE_" + keycloakRole.toUpperCase()))
-                    .collect(Collectors.toList());
+                    .toList();
 
             return new KeycloakAuthenticationToken(token.getAccount(), token.isInteractive(), grantedAuthorities);
         }
