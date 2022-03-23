@@ -133,7 +133,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         // tags to remove
         List<be.kuritsu.hetb.domain.Tag> tagEntitiesToRemove = expense.getTags().stream()
                 .filter(tagEntity -> !tagEntitiesFromRequest.contains(tagEntity))
-                .collect(Collectors.toList());
+                .toList();
         tagEntitiesToRemove.forEach(tagEntityToRemove -> {
             expense.removeTag(tagEntityToRemove);
             tagEntityToRemove.removeExpense(expense);
@@ -147,7 +147,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         // tags to add
         List<be.kuritsu.hetb.domain.Tag> tagEntitiesToAdd = tagEntitiesFromRequest.stream()
                 .filter(tagEntityFromRequest -> !expense.getTags().contains(tagEntityFromRequest))
-                .collect(Collectors.toList());
+                .toList();
         tagEntitiesToAdd.forEach(tagEntityToAdd -> {
             expense.addTag(tagEntityToAdd);
             tagEntityToAdd.addExpense(expense);
@@ -170,7 +170,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         List<be.kuritsu.hetb.domain.Tag> tagsWithNoLinkedExpenseAfterDeletion = expense.getTags()
                 .stream()
                 .filter(tag -> tag.getExpenses().size() == 1)
-                .collect(Collectors.toList());
+                .toList();
         expenseRepository.delete(expense);
 
         if (!tagsWithNoLinkedExpenseAfterDeletion.isEmpty()) {
@@ -207,7 +207,8 @@ public class ExpenseServiceImpl implements ExpenseService {
         response.setTotalNumberOfItems(Math.toIntExact(page.getTotalElements()));
         response.setItems(page.get()
                                   .map(expenseMapper::expenseToExpenseResponse)
-                                  .collect(Collectors.toList()));
+                                  .toList());
+
         return response;
     }
 }

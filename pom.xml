@@ -21,9 +21,9 @@
 	</repositories>
 
 	<properties>
-		<java.version>13</java.version>
-		<maven.compiler.source>13</maven.compiler.source>
-		<maven.compiler.target>13</maven.compiler.target>
+		<java.version>17</java.version>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
 
 		<sonar.projectKey>khyiu_heroku-expense-tracker-back</sonar.projectKey>
 		<sonar.organization>khyiu</sonar.organization>
@@ -239,7 +239,7 @@
 				<version>3.0.4</version>
 				<configuration>
 					<appName>heroku-expense-tracker-back</appName>
-					<jdkVersion>13</jdkVersion>
+					<jdkVersion>17</jdkVersion>
 					<processTypes>
 						<web>java $JAVA_OPTS -cp target/classes:target/dependency/* be.kuritsu.hetb.HerokuExpenseTrackerBackApplication -Dspring.profiles.active=heroku</web>
 					</processTypes>
