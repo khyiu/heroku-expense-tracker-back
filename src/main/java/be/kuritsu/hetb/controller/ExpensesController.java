@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -57,6 +58,12 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
     public ResponseEntity<Void> deleteExpense(String id) {
         expenseService.deleteExpense(UUID.fromString(id));
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<Resource> exportExpenses() {
+        // todo kyiu: implement
+        return null;
     }
 
     @Secured(ROLE_EXPENSE_TRACKER_USER)
