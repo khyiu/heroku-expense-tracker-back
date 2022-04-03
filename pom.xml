@@ -31,7 +31,7 @@
 
 		<keycloak.version>13.0.0</keycloak.version>
 
-		<api.version>53b9ffaf2113fde4ebc4b51ccb195ac94d80cb16</api.version>
+		<api.version>06f5e97eaa72adcfe8c2c469ab536eca9515017e</api.version>
 
 		<cucumber.version>6.11.0</cucumber.version>
 		<org.mapstruct.version>1.4.2.Final</org.mapstruct.version>

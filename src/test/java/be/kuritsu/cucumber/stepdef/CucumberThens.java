@@ -44,7 +44,7 @@ public class CucumberThens extends CucumberStepDefinitions {
         }
     }
 
-    @Then("he gets a response with status {int}")
+    @Then("he/she gets a response with status {int}")
     public void assertResponse(int responseStatusCode) {
         assertThat(state.getCurrentMvcResult()).isNotNull();
         assertThat(state.getCurrentMvcResult().getResponse().getStatus()).isEqualTo(responseStatusCode);
@@ -128,5 +128,17 @@ public class CucumberThens extends CucumberStepDefinitions {
                 assertThat(tag.getValue()).isEqualTo(expectedTag);
             });
         }
+    }
+
+    @Then("he/she receives an empty export file")
+    public void assertEmptyExportFile() throws Exception {
+        String csvFileContent = state.getCurrentMvcResult().getResponse().getContentAsString();
+        assertThat(csvFileContent).isBlank();
+    }
+
+    @Then("he/she receives an export file that contains {string}")
+    public void assertExportFileContains(String content) throws Exception {
+        String csvFileContent = state.getCurrentMvcResult().getResponse().getContentAsString();
+        assertThat(csvFileContent).isEqualTo(content);
     }
 }

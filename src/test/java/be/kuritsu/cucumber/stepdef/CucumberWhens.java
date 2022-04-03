@@ -144,7 +144,7 @@ public class CucumberWhens extends CucumberStepDefinitions {
         sendCreateExpenseRequest(expenseRequest);
     }
 
-    @When("he sends a request to register an expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {} and {}")
+    @When("he/she sends a request to register an expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {} and {}")
     public void register_a_parameterized_expense(LocalDate date,
                                                  BigDecimal amount,
                                                  List<String> tags,
@@ -185,7 +185,7 @@ public class CucumberWhens extends CucumberStepDefinitions {
                                           .andReturn());
     }
 
-    @When("he sends a request to edit the last expense created by {string} with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {} and {}")
+    @When("he/she sends a request to edit the last expense created by {string} with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {} and {}")
     public void register_a_parameterized_expense(String username,
                                                  LocalDate date,
                                                  BigDecimal amount,
@@ -285,6 +285,19 @@ public class CucumberWhens extends CucumberStepDefinitions {
     public void upload_expense_import_file(String filename) throws Exception {
         MockHttpServletRequestBuilder requestBuilder = multipart("/expenses/import")
                 .file(new MockMultipartFile("file", filename, String.valueOf(MimeType.valueOf("text/csv")), getClass().getResourceAsStream("/expense-imports/" + filename)));
+
+        if (state.getCurrentUserRequestPostProcessor() != null) {
+            requestBuilder.with(state.getCurrentUserRequestPostProcessor());
+        }
+
+        state.setCurrentMvcResult(state.getMockMvc()
+                                          .perform(requestBuilder)
+                                          .andReturn());
+    }
+
+    @When("he/she downloads his/her expenses")
+    public void download_expense_export() throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = get("/expenses/back-up");
 
         if (state.getCurrentUserRequestPostProcessor() != null) {
             requestBuilder.with(state.getCurrentUserRequestPostProcessor());
