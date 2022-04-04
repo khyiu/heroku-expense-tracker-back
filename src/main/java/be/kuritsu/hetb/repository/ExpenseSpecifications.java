@@ -22,11 +22,15 @@ public class ExpenseSpecifications implements Specification<Expense> {
     private final Boolean paidWithCreditCardFilter;
     private final Boolean creditCardStatementIssuedFilter;
 
+    public ExpenseSpecifications(String ownerUsername) {
+        this(ownerUsername, null, null, null, null);
+    }
+
     public ExpenseSpecifications(String ownerUsername,
-            List<String> tagFilters,
-            String descriptionFilter,
-            Boolean paidWithCreditCardFilter,
-            Boolean creditCardStatementIssuedFilter) {
+                                 List<String> tagFilters,
+                                 String descriptionFilter,
+                                 Boolean paidWithCreditCardFilter,
+                                 Boolean creditCardStatementIssuedFilter) {
         this.ownerUsername = ownerUsername;
         this.tagFilters = tagFilters;
         this.descriptionFilter = descriptionFilter;

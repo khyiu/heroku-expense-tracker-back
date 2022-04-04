@@ -139,6 +139,6 @@ public class CucumberThens extends CucumberStepDefinitions {
     @Then("he/she receives an export file that contains {string}")
     public void assertExportFileContains(String content) throws Exception {
         String csvFileContent = state.getCurrentMvcResult().getResponse().getContentAsString();
-        assertThat(csvFileContent).isEqualTo(content);
+        assertThat(csvFileContent.trim()).isEqualTo(content);
     }
 }

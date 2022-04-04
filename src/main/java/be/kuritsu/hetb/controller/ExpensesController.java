@@ -2,12 +2,18 @@ package be.kuritsu.hetb.controller;
 
 import static be.kuritsu.hetb.config.SecurityConfig.ROLE_EXPENSE_TRACKER_USER;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -19,6 +25,8 @@ import be.kuritsu.het.api.ExpensesApi;
 import be.kuritsu.het.model.ExpenseListResponse;
 import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.het.model.ExpenseResponse;
+import be.kuritsu.hetb.exception.TechnicalException;
+import be.kuritsu.hetb.service.ExpenseExportService;
 import be.kuritsu.hetb.service.ExpenseImportService;
 import be.kuritsu.hetb.service.ExpenseService;
 
@@ -27,11 +35,13 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
 
     private final ExpenseService expenseService;
     private final ExpenseImportService expenseImportService;
+    private final ExpenseExportService expenseExportService;
 
     @Autowired
-    public ExpensesController(ExpenseService expenseService, ExpenseImportService expenseImportService) {
+    public ExpensesController(ExpenseService expenseService, ExpenseImportService expenseImportService, ExpenseExportService expenseExportService) {
         this.expenseService = expenseService;
         this.expenseImportService = expenseImportService;
+        this.expenseExportService = expenseExportService;
     }
 
     @Secured(ROLE_EXPENSE_TRACKER_USER)
@@ -60,10 +70,26 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
         return ResponseEntity.ok().build();
     }
 
+    @Secured(ROLE_EXPENSE_TRACKER_USER)
     @Override
     public ResponseEntity<Resource> exportExpenses() {
-        // todo kyiu: implement
-        return null;
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                PrintStream printStream = new PrintStream(byteArrayOutputStream)) {
+            expenseExportService.exportExpenses(printStream);
+
+            ByteArrayResource resource = new ByteArrayResource(byteArrayOutputStream.toByteArray());
+
+            String formattedDate = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
+                    .replaceAll("[:.]", "_");
+            String proposedFilename = String.format("expense_tracker_export_%s.csv", formattedDate);
+            String contentDispositionHeaderValue = String.format("attachment; filename=\"%s\"", proposedFilename);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, contentDispositionHeaderValue)
+                    .body(resource);
+        } catch (IOException e) {
+            throw new TechnicalException("An error happened during export of expenses", e);
+        }
     }
 
     @Secured(ROLE_EXPENSE_TRACKER_USER)

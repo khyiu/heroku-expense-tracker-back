@@ -34,7 +34,6 @@ public class ExpenseImportServiceImpl implements ExpenseImportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExpenseImportServiceImpl.class);
     private static final Pattern EXPENSE_LINE_PATTERN = Pattern.compile("^(?<date>.*);(?<amount>.*);(?<tag>.*);(?<description>.*)$");
     private static final Pattern EXPENSE_DESCRIPTION_WITH_CREDIT_CARD_PATTERN = Pattern.compile("^(?<description>.*)\\[(.+):(?<creditCardIndicator>.*)\\]$");
-    private static final DateTimeFormatter EXPENSE_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -104,7 +103,7 @@ public class ExpenseImportServiceImpl implements ExpenseImportService {
                 .orElse(new Tag().value(expenseTag));
 
         return new ExpenseRequest()
-                .date(LocalDate.parse(expenseMatcher.group("date"), EXPENSE_DATE_FORMATTER))
+                .date(LocalDate.parse(expenseMatcher.group("date"), ExpenseConstants.EXPENSE_DATE_FORMATTER))
                 .amount(new BigDecimal(expenseMatcher.group("amount").replace(',', '.'))
                                 .setScale(2, RoundingMode.HALF_EVEN))
                 .description(expenseDescription.trim())
