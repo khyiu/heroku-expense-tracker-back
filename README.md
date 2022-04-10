@@ -278,3 +278,8 @@ keycloak.cors=true
 
 5. Add `caches` and `metrics` Spring Actuator endpoints, to the `management.endpoints.web.exposure.include` application property.  
    These 2 endpoints list the caches that have been created and some basic statistics such as the number of times data have been read/removed from caches.
+
+### 12 Use Content-Disposition response header in combination with Angular
+When CORS is enabled, the Angular HTTP client needs to be told by the server, what response headers should be made available.  
+In order to make the `content-disposition` header available, we have to add the `Access-Control-Expose-Headers` response header with
+value = _content-disposition_

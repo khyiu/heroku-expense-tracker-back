@@ -85,6 +85,7 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
             String contentDispositionHeaderValue = String.format("attachment; filename=\"%s\"", proposedFilename);
 
             return ResponseEntity.ok()
+                    .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
                     .header(HttpHeaders.CONTENT_DISPOSITION, contentDispositionHeaderValue)
                     .body(resource);
         } catch (IOException e) {
