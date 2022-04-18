@@ -69,6 +69,9 @@ public class Expense {
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> tags = new TreeSet<>();
 
+    @Column(name = "checked")
+    private Boolean checked;
+
     @Column(name = "\"order\"")
     private Integer order;
 
@@ -89,6 +92,14 @@ public class Expense {
         tags.remove(tag);
     }
 
+    public Boolean getChecked() {
+        return checked;
+    }
+
+    public void setChecked(Boolean checked) {
+        this.checked = checked;
+    }
+
     @Override
     public String toString() {
         return "Expense{" +
@@ -102,6 +113,7 @@ public class Expense {
                 ", creditCardStatementIssued=" + creditCardStatementIssued +
                 ", tags=" + tags +
                 ", order=" + order +
+                ", checked=" + checked +
                 '}';
     }
 }

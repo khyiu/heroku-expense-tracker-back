@@ -58,4 +58,6 @@ public interface ExpenseService {
             this.sortBy = sortBy;
         }
     }
+
+    List<ExpenseResponse> updateExpensesStatus(Boolean status, List<String> ids);
 }

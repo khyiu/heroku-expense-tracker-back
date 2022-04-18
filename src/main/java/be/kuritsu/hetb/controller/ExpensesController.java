@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import be.kuritsu.het.api.ExpenseApi;
 import be.kuritsu.het.api.ExpensesApi;
+import be.kuritsu.het.model.ExpenseCheckedStatusRequest;
 import be.kuritsu.het.model.ExpenseListResponse;
 import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.het.model.ExpenseResponse;
@@ -49,6 +50,13 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
     public ResponseEntity<ExpenseResponse> registerExpense(ExpenseRequest expenseRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(expenseService.registerExpense(expenseRequest));
+    }
+
+    @Secured(ROLE_EXPENSE_TRACKER_USER)
+    @Override
+    public ResponseEntity<List<ExpenseResponse>> updateExpensesCheckedStatus(ExpenseCheckedStatusRequest expenseCheckedStatusRequest) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(expenseService.updateExpensesStatus(expenseCheckedStatusRequest.getChecked(), expenseCheckedStatusRequest.getExpenseIds()));
     }
 
     @Secured(ROLE_EXPENSE_TRACKER_USER)

@@ -1,6 +1,7 @@
 package be.kuritsu.hetb.repository;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +22,8 @@ public interface ExpenseRepository extends JpaRepository<Expense, UUID>, JpaSpec
 
     @Query("SELECT COALESCE(SUM(e.amount), 0) FROM Expense e where e.owner = :owner")
     BigDecimal getBalance(@Param("owner") String owner);
+
+    @SecuritySubject
+    @Override
+    List<Expense> findAllById(Iterable<UUID> uuids);
 }

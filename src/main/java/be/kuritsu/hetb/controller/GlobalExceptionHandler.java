@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import be.kuritsu.hetb.exception.AccessDeniedException;
+import be.kuritsu.hetb.exception.InvalidRequestException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -27,5 +28,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleOversizedAttachmentException(FileSizeLimitExceededException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body("Attachment exceeded maximum size");
+    }
+
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<String> handleInvalidRequestException(InvalidRequestException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
     }
 }

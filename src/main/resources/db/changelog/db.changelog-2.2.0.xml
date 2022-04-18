@@ -4,8 +4,11 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
-	<include file="db.changelog-1.0.0.xml" relativeToChangelogFile="true"/>
-	<include file="db.changelog-2.0.0.xml" relativeToChangelogFile="true"/>
-	<include file="db.changelog-2.1.0.xml" relativeToChangelogFile="true"/>
-	<include file="db.changelog-2.2.0.xml" relativeToChangelogFile="true"/>
+
+	<changeSet id="add_checked_status_column_to_expense" author="kyiu">
+		<addColumn schemaName="het" tableName="expense">
+			<column name="checked" type="boolean"></column>
+		</addColumn>
+	</changeSet>
+
 </databaseChangeLog>

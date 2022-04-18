@@ -1,6 +1,7 @@
 package be.kuritsu.hetb.security;
 
 import java.text.MessageFormat;
+import java.util.Collection;
 
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -22,11 +23,24 @@ public class SecurityAspect {
     }
 
     @AfterReturning(value = "@annotation(SecuritySubject)", returning = "expense")
-    public void logBeforeMethodCall(Expense expense) {
+    public void checkExpenseAccess(Expense expense) {
         String currentUserName = securityContextService.getAuthenticatedUserName();
 
         if (!expense.getOwner().equals(currentUserName)) {
             throw new AccessDeniedException(MessageFormat.format("Current user [{0}] cannot access expense [{1}]", currentUserName, expense.getId()));
+        }
+    }
+
+    @AfterReturning(value = "@annotation(SecuritySubject)", returning = "expenses")
+    public void checkExpensesAccess(Collection<Expense> expenses) {
+        String currentUserName = securityContextService.getAuthenticatedUserName();
+
+        if (expenses != null) {
+            expenses.forEach(expense -> {
+                if (!expense.getOwner().equals(currentUserName)) {
+                    throw new AccessDeniedException(MessageFormat.format("Current user [{0}] cannot access expense [{1}]", currentUserName, expense.getId()));
+                }
+            });
         }
     }
 }

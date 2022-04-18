@@ -27,6 +27,7 @@ import be.kuritsu.het.model.ExpenseResponse;
 import be.kuritsu.het.model.Tag;
 import be.kuritsu.hetb.caching.CacheNames;
 import be.kuritsu.hetb.domain.Expense;
+import be.kuritsu.hetb.exception.InvalidRequestException;
 import be.kuritsu.hetb.mapper.ExpenseMapper;
 import be.kuritsu.hetb.mapper.TagMapper;
 import be.kuritsu.hetb.repository.ExpenseRepository;
@@ -210,5 +211,22 @@ public class ExpenseServiceImpl implements ExpenseService {
                                   .toList());
 
         return response;
+    }
+
+    @Override
+    public List<ExpenseResponse> updateExpensesStatus(Boolean status, List<String> ids) {
+        List<UUID> uuids = ids.stream()
+                .map(UUID::fromString)
+                .toList();
+        List<Expense> expenses = expenseRepository.findAllById(uuids);
+
+        if (expenses.size() != uuids.size()) {
+            throw new InvalidRequestException("Some specified expenses haven't been found");
+        }
+
+        expenses.forEach(expense -> expense.setChecked(status));
+        return expenses.stream()
+                .map(expenseMapper::expenseToExpenseResponse)
+                .toList();
     }
 }
