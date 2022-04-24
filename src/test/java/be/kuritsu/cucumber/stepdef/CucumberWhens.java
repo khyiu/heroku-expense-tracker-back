@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +23,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.MimeType;
 
 import be.kuritsu.cucumber.CucumberState;
+import be.kuritsu.het.model.ExpenseCheckedStatusRequest;
 import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.het.model.ExpenseResponse;
 import be.kuritsu.het.model.Tag;
 import be.kuritsu.testutil.ExpenseRequestFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.When;
@@ -302,6 +306,49 @@ public class CucumberWhens extends CucumberStepDefinitions {
         if (state.getCurrentUserRequestPostProcessor() != null) {
             requestBuilder.with(state.getCurrentUserRequestPostProcessor());
         }
+
+        state.setCurrentMvcResult(state.getMockMvc()
+                                          .perform(requestBuilder)
+                                          .andReturn());
+    }
+
+    @When("he/she updates the \"checked\" status to {} of expenses with ids={nullableStringList}")
+    public void update_expenses_checked_status(boolean checked, List<String> expenseIds) throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = patch("/expenses/checked-status");
+
+        if (state.getCurrentUserRequestPostProcessor() != null) {
+            requestBuilder.with(state.getCurrentUserRequestPostProcessor());
+        }
+
+        ExpenseCheckedStatusRequest request = new ExpenseCheckedStatusRequest()
+                .checked(checked)
+                .expenseIds(expenseIds);
+
+        requestBuilder.contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request));
+
+        state.setCurrentMvcResult(state.getMockMvc()
+                                          .perform(requestBuilder)
+                                          .andReturn());
+    }
+
+    @When("he/she updates the \"checked\" status of the last expense created by {string}, to {}")
+    public void update_checked_status_of_last_expense_created_by(String username, boolean checked) throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = patch("/expenses/checked-status");
+
+        if (state.getCurrentUserRequestPostProcessor() != null) {
+            requestBuilder.with(state.getCurrentUserRequestPostProcessor());
+        }
+
+        MvcResult lastMvcResult = state.getUserLastCreatedExpenseResults().get(username);
+        ExpenseResponse lastExpenseResponse = objectMapper.readValue(lastMvcResult.getResponse().getContentAsString(), ExpenseResponse.class);
+
+        ExpenseCheckedStatusRequest request = new ExpenseCheckedStatusRequest()
+                .checked(checked)
+                .expenseIds(Collections.singletonList(lastExpenseResponse.getId().toString()));
+
+        requestBuilder.contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request));
 
         state.setCurrentMvcResult(state.getMockMvc()
                                           .perform(requestBuilder)

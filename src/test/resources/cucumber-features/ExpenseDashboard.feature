@@ -29,10 +29,10 @@ Feature: Expense dashboard
     When he sends a request to retrieve his expenses with page number=1, page size=2, sortBy=AMOUNT, sortDirection=DESC, tag filters=null and description filter=null
     Then he gets a response with status 200
     And he receives a list of 2 expenses
-    And he receives a list of expenses containing at index 0 an expense with 01/09/2021, 250.00, Cotisation_sport, "null", false and false
-    And he receives a list of expenses containing at index 1 an expense with 15/04/2021, 52.50, achat_sport, "Decathlon", true and true
+    And he receives a list of expenses containing at index 0 an expense with 01/09/2021, 250.00, Cotisation_sport, "null", false, false and null
+    And he receives a list of expenses containing at index 1 an expense with 15/04/2021, 52.50, achat_sport, "Decathlon", true, true and null
     When he sends a request to retrieve his expenses with page number=2, page size=2, sortBy=AMOUNT, sortDirection=DESC, tag filters=null and description filter=null
     Then he gets a response with status 200
     And he receives a list of 2 expenses
-    And he receives a list of expenses containing at index 0 an expense with 15/04/2021, 27.50, courses, "Courses @ Carrefour", true and false
-    And he receives a list of expenses containing at index 1 an expense with 01/04/2021, 3.50, Belfius;frais_bancaire, "frais de gestion compte a vue", false and false
+    And he receives a list of expenses containing at index 0 an expense with 15/04/2021, 27.50, courses, "Courses @ Carrefour", true, false and null
+    And he receives a list of expenses containing at index 1 an expense with 01/04/2021, 3.50, Belfius;frais_bancaire, "frais de gestion compte a vue", false, false and null

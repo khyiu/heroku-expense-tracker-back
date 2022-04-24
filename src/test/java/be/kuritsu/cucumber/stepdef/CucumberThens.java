@@ -56,13 +56,14 @@ public class CucumberThens extends CucumberStepDefinitions {
         assertThat(state.getCurrentMvcResult().getResponse().getRedirectedUrl()).isEqualTo(redirectURL);
     }
 
-    @Then("he receives the persisted expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {} and {}")
+    @Then("he receives the persisted expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {}, {} and {nullableBoolean}")
     public void assertPersistedExpense(LocalDate date,
                                        BigDecimal amount,
                                        List<String> tags,
                                        String description,
                                        Boolean paidWithCreditCard,
-                                       Boolean creditCardStatementIssued) throws UnsupportedEncodingException, JsonProcessingException {
+                                       Boolean creditCardStatementIssued,
+                                       Boolean checked) throws UnsupportedEncodingException, JsonProcessingException {
 
         ExpenseResponse expenseResponse = objectMapper.readValue(state.getCurrentMvcResult().getResponse().getContentAsString(), ExpenseResponse.class);
         assertThat(expenseResponse.getId()).isNotNull();
@@ -77,6 +78,7 @@ public class CucumberThens extends CucumberStepDefinitions {
         assertThat(expenseResponse.getDescription()).isEqualTo(description);
         assertThat(expenseResponse.getPaidWithCreditCard()).isEqualTo(paidWithCreditCard);
         assertThat(expenseResponse.getCreditCardStatementIssued()).isEqualTo(creditCardStatementIssued);
+        assertThat(expenseResponse.getChecked()).isEqualTo(checked);
     }
 
     @Then("he receives a list of {int} expense(s)")
@@ -85,14 +87,15 @@ public class CucumberThens extends CucumberStepDefinitions {
         assertThat(expenseListResponse.getItems()).hasSize(expectedNbExpenses);
     }
 
-    @Then("he receives a list of expenses containing at index {int} an expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {} and {}")
+    @Then("he receives a list of expenses containing at index {int} an expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {}, {} and {nullableBoolean}")
     public void assertExpenseFromDashboard(int index,
                                            LocalDate date,
                                            BigDecimal amount,
                                            List<String> tags,
                                            String description,
                                            Boolean paidWithCreditCard,
-                                           Boolean creditCardStatementIssued) throws Exception {
+                                           Boolean creditCardStatementIssued,
+                                           Boolean checked) throws Exception {
         ExpenseListResponse expenseListResponse = objectMapper.readValue(state.getCurrentMvcResult().getResponse().getContentAsString(), ExpenseListResponse.class);
         ExpenseResponse expenseResponse = expenseListResponse.getItems().get(index);
         assertThat(expenseResponse.getId()).isNotNull();
@@ -107,6 +110,7 @@ public class CucumberThens extends CucumberStepDefinitions {
         assertThat(expenseResponse.getDescription()).isEqualTo(description);
         assertThat(expenseResponse.getPaidWithCreditCard()).isEqualTo(paidWithCreditCard);
         assertThat(expenseResponse.getCreditCardStatementIssued()).isEqualTo(creditCardStatementIssued);
+        assertThat(expenseResponse.getChecked()).isEqualTo(checked);
     }
 
     @Then("he receives a balance equal to {nullableAmount}")

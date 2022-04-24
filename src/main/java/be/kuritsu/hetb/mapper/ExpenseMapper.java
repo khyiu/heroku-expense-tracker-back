@@ -1,7 +1,5 @@
 package be.kuritsu.hetb.mapper;
 
-import java.util.UUID;
-
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 
@@ -16,7 +14,4 @@ public interface ExpenseMapper {
 
     ExpenseResponse expenseToExpenseResponse(Expense expense);
 
-    default String fromUUID(UUID id) {
-        return id.toString();
-    }
 }

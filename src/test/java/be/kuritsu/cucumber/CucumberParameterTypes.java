@@ -21,7 +21,7 @@ public class CucumberParameterTypes {
         return date.equals("null") ? null : LocalDate.parse(date, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
 
-    @ParameterType(value = "\\w+(?:;\\w+)*|null|;")
+    @ParameterType(value = "[a-zA-Z_0-9-]+(?:;[a-zA-Z_0-9-]+)*|null|;")
     public List<String> nullableStringList(String tags) {
         if (tags.equals("null")) {
             return null;
@@ -47,5 +47,12 @@ public class CucumberParameterTypes {
     @ParameterType(value = "DATE|AMOUNT")
     public String sortBy(String sortBy) {
         return sortBy;
+    }
+
+    @ParameterType(value = "true|TRUE|false|FALSE|null|NULL")
+    public Boolean nullableBoolean(String value) {
+        return value.equalsIgnoreCase("null") ?
+                null:
+                Boolean.valueOf(value);
     }
 }
