@@ -17,7 +17,7 @@ Feature: Import expenses
     Then he gets a response with status 200
     When he sends a request to retrieve his expenses balance
     Then he receives a balance equal to 757.40
-    When he sends a request to retrieve his expenses with page number=1, page size=10, sortBy=DATE, sortDirection=DESC, tag filters=null and description filter=null
+    When he sends a request to retrieve his expenses with page number=1, page size=10, sortBy=DATE, sortDirection=DESC, tag filters=null, description filters=null, date lower bound=null, date upper bound=null, checked status=null, paid with credit card=null and credit card statement issued=null
     Then he gets a response with status 200
     And he receives a list of 6 expenses
     And he receives a list of expenses containing at index 0 an expense with 01/03/2022, -152.00, Alimentaire, "Restaurant japonais", true, true and null

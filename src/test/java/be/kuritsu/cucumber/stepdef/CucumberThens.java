@@ -87,7 +87,7 @@ public class CucumberThens extends CucumberStepDefinitions {
         assertThat(expenseListResponse.getItems()).hasSize(expectedNbExpenses);
     }
 
-    @Then("he receives a list of expenses containing at index {int} an expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {}, {} and {nullableBoolean}")
+    @Then("he/she receives a list of expenses containing at index {int} an expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {}, {} and {nullableBoolean}")
     public void assertExpenseFromDashboard(int index,
                                            LocalDate date,
                                            BigDecimal amount,
@@ -119,7 +119,7 @@ public class CucumberThens extends CucumberStepDefinitions {
         assertThat(fetchedBalance).isEqualByComparingTo(balance);
     }
 
-    @Then("he receives a list of tags that contains {nullableStringList}")
+    @Then("he/she receives a list of tags that contains {nullableStringList}")
     public void assertTags(List<String> expectedTags) throws Exception {
         List<Tag> tags = objectMapper.readValue(state.getCurrentMvcResult().getResponse().getContentAsString(), new TypeReference<List<Tag>>() {
         });

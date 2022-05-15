@@ -1,41 +1,43 @@
 package be.kuritsu.hetb.repository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.CollectionUtils;
 
 import be.kuritsu.hetb.domain.Expense;
+import be.kuritsu.hetb.domain.Tag;
 
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
+@Accessors(chain = true, fluent = true)
+@Setter
 public class ExpenseSpecifications implements Specification<Expense> {
 
     private final String ownerUsername;
-    private final List<String> tagFilters;
-    private final String descriptionFilter;
-    private final Boolean paidWithCreditCardFilter;
-    private final Boolean creditCardStatementIssuedFilter;
+    private List<String> tagFilters;
+    private List<String> descriptionFilters;
+    private Boolean paidWithCreditCardFilter;
+    private Boolean creditCardStatementIssuedFilter;
+    private LocalDate inclusiveDateLowerBound;
+    private LocalDate inclusiveDateUpperBound;
+    private Boolean checked;
 
     public ExpenseSpecifications(String ownerUsername) {
-        this(ownerUsername, null, null, null, null);
-    }
-
-    public ExpenseSpecifications(String ownerUsername,
-                                 List<String> tagFilters,
-                                 String descriptionFilter,
-                                 Boolean paidWithCreditCardFilter,
-                                 Boolean creditCardStatementIssuedFilter) {
         this.ownerUsername = ownerUsername;
-        this.tagFilters = tagFilters;
-        this.descriptionFilter = descriptionFilter;
-        this.paidWithCreditCardFilter = paidWithCreditCardFilter;
-        this.creditCardStatementIssuedFilter = creditCardStatementIssuedFilter;
     }
 
     @Override
@@ -45,27 +47,51 @@ public class ExpenseSpecifications implements Specification<Expense> {
         Predicate ownerPredicate = criteriaBuilder.equal(root.get("owner"), ownerUsername);
         predicates.add(ownerPredicate);
 
-        if (tagFilters != null) {
+        if (!CollectionUtils.isEmpty(tagFilters)) {
             tagFilters.forEach(tagFilter -> {
-                Predicate tagPredicate = criteriaBuilder.isMember(tagFilter, root.get("tags"));
-                predicates.add(tagPredicate);
+                Subquery<Tag> subquery = query.subquery(Tag.class);
+                Root<Tag> tagRoot = subquery.from(Tag.class);
+                Predicate tagIdPredicate = criteriaBuilder.equal(tagRoot.get("id"), UUID.fromString(tagFilter));
+
+                Join<Object, Object> expense = tagRoot.join("expenses");
+                Predicate expenseIdPredicate = criteriaBuilder.equal(expense.get("id"), root.get("id"));
+
+                Predicate hasTagPredicate = criteriaBuilder.exists(subquery.select(tagRoot.get("id")).where(tagIdPredicate, expenseIdPredicate));
+                predicates.add(hasTagPredicate);
             });
         }
 
-        if (descriptionFilter != null) {
-            String likeCondition = "%" + StringUtils.stripAccents(descriptionFilter).toUpperCase(Locale.ROOT) + "%";
-            Predicate descriptionPredicate = criteriaBuilder.like(criteriaBuilder.upper(root.get("description")), likeCondition);
-            predicates.add(descriptionPredicate);
+        if (!CollectionUtils.isEmpty(descriptionFilters)) {
+            descriptionFilters.forEach(descriptionFilter -> {
+                String likeCondition = "%" + StringUtils.stripAccents(descriptionFilter).toUpperCase(Locale.ROOT) + "%";
+                Predicate descriptionPredicate = criteriaBuilder.like(criteriaBuilder.upper(root.get("description")), likeCondition);
+                predicates.add(descriptionPredicate);
+            });
         }
 
         if (paidWithCreditCardFilter != null) {
-            Predicate creditCardPredicate = criteriaBuilder.equal(root.get("paidWithCreditCardFilter"), this.paidWithCreditCardFilter);
+            Predicate creditCardPredicate = criteriaBuilder.equal(root.get("paidWithCreditCard"), paidWithCreditCardFilter);
             predicates.add(creditCardPredicate);
         }
 
         if (creditCardStatementIssuedFilter != null) {
-            Predicate statementPredicate = criteriaBuilder.equal(root.get("creditCardStatementIssued"), this.creditCardStatementIssuedFilter);
+            Predicate statementPredicate = criteriaBuilder.equal(root.get("creditCardStatementIssued"), creditCardStatementIssuedFilter);
             predicates.add(statementPredicate);
+        }
+
+        if (inclusiveDateLowerBound != null) {
+            Predicate datePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get("date"), inclusiveDateLowerBound);
+            predicates.add(datePredicate);
+        }
+
+        if (inclusiveDateUpperBound != null) {
+            Predicate datePredicate = criteriaBuilder.lessThanOrEqualTo(root.get("date"), inclusiveDateUpperBound);
+            predicates.add(datePredicate);
+        }
+
+        if (checked != null) {
+            Predicate checkedPredicate = criteriaBuilder.equal(root.get("checked"), checked);
+            predicates.add(checkedPredicate);
         }
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[] {}));

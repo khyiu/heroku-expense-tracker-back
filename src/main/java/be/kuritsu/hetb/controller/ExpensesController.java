@@ -5,6 +5,7 @@ import static be.kuritsu.hetb.config.SecurityConfig.ROLE_EXPENSE_TRACKER_USER;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -104,21 +105,27 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
     @Secured(ROLE_EXPENSE_TRACKER_USER)
     @Override
     public ResponseEntity<ExpenseListResponse> getExpenses(Integer pageSize,
-            Integer pageNumber,
-            String sortDirection,
-            String sortBy,
-            List<String> tagFilters,
-            String descriptionFilter,
-            Boolean paidWithCreditCardFilter,
-            Boolean creditCardStatementIssuedFilter) {
+                                                           Integer pageNumber,
+                                                           String sortDirection,
+                                                           String sortBy,
+                                                           List<String> tagFilters,
+                                                           List<String> descriptionFilters,
+                                                           Boolean paidWithCreditCardFilter,
+                                                           Boolean creditCardStatementIssuedFilter,
+                                                           LocalDate inclusiveDateLowerBound,
+                                                           LocalDate inclusiveDateUpperBound,
+                                                           Boolean checked) {
         ExpenseService.ExpenseListRequest expenseListRequest = new ExpenseService.ExpenseListRequest(pageSize,
-                pageNumber,
-                ExpenseService.SortDirection.valueOf(sortDirection),
-                ExpenseService.SortBy.valueOf(sortBy))
+                                                                                                     pageNumber,
+                                                                                                     ExpenseService.SortDirection.valueOf(sortDirection),
+                                                                                                     ExpenseService.SortBy.valueOf(sortBy))
                 .tagFilters(tagFilters)
-                .descriptionFilter(descriptionFilter)
+                .descriptionFilters(descriptionFilters)
                 .paidWithCreditCardFilter(paidWithCreditCardFilter)
-                .creditCardStatementIssuedFilter(creditCardStatementIssuedFilter);
+                .creditCardStatementIssuedFilter(creditCardStatementIssuedFilter)
+                .inclusiveDateLowerBound(inclusiveDateLowerBound)
+                .inclusiveDateUpperBound(inclusiveDateUpperBound)
+                .checked(checked);
 
         return ResponseEntity.ok(expenseService.getExpenses(expenseListRequest));
     }

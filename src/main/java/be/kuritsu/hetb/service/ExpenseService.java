@@ -1,5 +1,6 @@
 package be.kuritsu.hetb.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,14 +45,17 @@ public interface ExpenseService {
         private final SortDirection sortDirection;
         private final SortBy sortBy;
         private List<String> tagFilters;
-        private String descriptionFilter;
+        private List<String> descriptionFilters;
         private Boolean paidWithCreditCardFilter;
         private Boolean creditCardStatementIssuedFilter;
+        private LocalDate inclusiveDateLowerBound;
+        private LocalDate inclusiveDateUpperBound;
+        private Boolean checked;
 
         public ExpenseListRequest(@NonNull Integer pageSize,
-                @NonNull Integer pageNumber,
-                @NonNull SortDirection sortDirection,
-                @NonNull SortBy sortBy) {
+                                  @NonNull Integer pageNumber,
+                                  @NonNull SortDirection sortDirection,
+                                  @NonNull SortBy sortBy) {
             this.pageSize = pageSize;
             this.pageNumber = pageNumber;
             this.sortDirection = sortDirection;

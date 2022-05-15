@@ -184,11 +184,15 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         Sort.Direction sortDir = expenseListRequest.sortDirection() == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC;
 
-        ExpenseSpecifications specs = new ExpenseSpecifications(securityContextService.getAuthenticatedUserName(),
-                                                                expenseListRequest.tagFilters(),
-                                                                expenseListRequest.descriptionFilter(),
-                                                                expenseListRequest.paidWithCreditCardFilter(),
-                                                                expenseListRequest.creditCardStatementIssuedFilter());
+        ExpenseSpecifications specs = new ExpenseSpecifications(securityContextService.getAuthenticatedUserName())
+                .tagFilters(expenseListRequest.tagFilters())
+                .descriptionFilters(expenseListRequest.descriptionFilters())
+                .paidWithCreditCardFilter(expenseListRequest.paidWithCreditCardFilter())
+                .creditCardStatementIssuedFilter(expenseListRequest.creditCardStatementIssuedFilter())
+                .inclusiveDateLowerBound(expenseListRequest.inclusiveDateLowerBound())
+                .inclusiveDateUpperBound(expenseListRequest.inclusiveDateUpperBound())
+                .checked(expenseListRequest.checked());
+
         PageRequest pageRequest;
 
         if (expenseListRequest.sortBy() == SortBy.DATE) {

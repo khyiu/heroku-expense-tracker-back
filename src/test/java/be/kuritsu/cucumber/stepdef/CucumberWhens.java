@@ -5,13 +5,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
@@ -28,8 +31,6 @@ import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.het.model.ExpenseResponse;
 import be.kuritsu.het.model.Tag;
 import be.kuritsu.testutil.ExpenseRequestFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.When;
@@ -225,13 +226,29 @@ public class CucumberWhens extends CucumberStepDefinitions {
                                           .andReturn());
     }
 
-    @When("he sends a request to retrieve his expenses with page number={int}, "
+    @When("he/she sends a request to retrieve his expenses with page number={int}, "
             + "page size={int}, "
             + "sortBy={sortBy}, "
             + "sortDirection={sortDirection}, "
-            + "tag filters={nullableStringList} "
-            + "and description filter={nullableString}")
-    public void retrieve_expenses(int pageNumber, int pageSize, String sortBy, String sortDirection, List<String> tagFilters, String descriptionFilter) throws Exception {
+            + "tag filters={nullableStringList}, "
+            + "description filters={nullableStringList}, "
+            + "date lower bound={nullableDate}, "
+            + "date upper bound={nullableDate}, "
+            + "checked status={nullableBoolean}, "
+            + "paid with credit card={nullableBoolean} "
+            + "and credit card statement issued={nullableBoolean}")
+    public void retrieve_expenses(int pageNumber,
+                                  int pageSize,
+                                  String sortBy,
+                                  String sortDirection,
+                                  List<String> tagFilters,
+                                  List<String> descriptionFilters,
+                                  LocalDate dateLowerBound,
+                                  LocalDate dateUpperBound,
+                                  Boolean checked,
+                                  Boolean paidWithCreditCardFilter,
+                                  Boolean creditCardStatementIssuedFilter
+    ) throws Exception {
         MockHttpServletRequestBuilder requestBuilder = get("/expenses")
                 .param("pageNumber", String.format("%d", pageNumber))
                 .param("pageSize", String.format("%d", pageSize))
@@ -239,11 +256,39 @@ public class CucumberWhens extends CucumberStepDefinitions {
                 .param("sortDirection", sortDirection);
 
         if (tagFilters != null) {
-            requestBuilder.param("pageFilters", tagFilters.toArray(new String[] {}));
+            Map<String, Tag> currentUserTags = state.getUserTags().get(state.getCurrentUsername());
+            String tagFiltersString = tagFilters.stream()
+                    .map(currentUserTags::get)
+                    .filter(Objects::nonNull)
+                    .map(Tag::getId)
+                    .map(UUID::toString)
+                    .collect(Collectors.joining(","));
+
+            requestBuilder.param("tagFilters", tagFiltersString);
         }
 
-        if (descriptionFilter != null) {
-            requestBuilder.param("descriptionFilter", descriptionFilter);
+        if (descriptionFilters != null) {
+            requestBuilder.param("descriptionFilters", Strings.join(descriptionFilters, ','));
+        }
+
+        if (dateLowerBound != null) {
+            requestBuilder.param("inclusiveDateLowerBound", dateLowerBound.format(DateTimeFormatter.ISO_DATE));
+        }
+
+        if (dateUpperBound != null) {
+            requestBuilder.param("inclusiveDateUpperBound", dateUpperBound.format(DateTimeFormatter.ISO_DATE));
+        }
+
+        if (checked != null) {
+            requestBuilder.param("checked", checked.toString());
+        }
+
+        if (paidWithCreditCardFilter != null) {
+            requestBuilder.param("paidWithCreditCardFilter", paidWithCreditCardFilter.toString());
+        }
+
+        if (creditCardStatementIssuedFilter != null) {
+            requestBuilder.param("creditCardStatementIssuedFilter", creditCardStatementIssuedFilter.toString());
         }
 
         if (state.getCurrentUserRequestPostProcessor() != null) {
@@ -268,7 +313,7 @@ public class CucumberWhens extends CucumberStepDefinitions {
                                           .andReturn());
     }
 
-    @When("he sends a request to retrieve his tags with query {nullableString}")
+    @When("he/she sends a request to retrieve his tags with query {nullableString}")
     public void retrieve_tags(@Nullable String query) throws Exception {
         MockHttpServletRequestBuilder requestBuilder = get("/tags");
 
