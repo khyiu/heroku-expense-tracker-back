@@ -1,5 +1,6 @@
 package be.kuritsu.hetb.repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,8 @@ public class ExpenseSpecifications implements Specification<Expense> {
     private Boolean creditCardStatementIssuedFilter;
     private LocalDate inclusiveDateLowerBound;
     private LocalDate inclusiveDateUpperBound;
+    private BigDecimal inclusiveAmountLowerBound;
+    private BigDecimal inclusiveAmountUpperBound;
     private Boolean checked;
 
     public ExpenseSpecifications(String ownerUsername) {
@@ -92,6 +95,16 @@ public class ExpenseSpecifications implements Specification<Expense> {
         if (checked != null) {
             Predicate checkedPredicate = criteriaBuilder.equal(root.get("checked"), checked);
             predicates.add(checkedPredicate);
+        }
+
+        if (inclusiveAmountLowerBound != null) {
+            Predicate amountPredicate = criteriaBuilder.greaterThanOrEqualTo(root.get("amount"), inclusiveAmountLowerBound);
+            predicates.add(amountPredicate);
+        }
+
+        if (inclusiveAmountUpperBound != null) {
+            Predicate amountPredicate = criteriaBuilder.lessThanOrEqualTo(root.get("amount"), inclusiveAmountUpperBound);
+            predicates.add(amountPredicate);
         }
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[] {}));

@@ -235,8 +235,10 @@ public class CucumberWhens extends CucumberStepDefinitions {
             + "date lower bound={nullableDate}, "
             + "date upper bound={nullableDate}, "
             + "checked status={nullableBoolean}, "
-            + "paid with credit card={nullableBoolean} "
-            + "and credit card statement issued={nullableBoolean}")
+            + "paid with credit card={nullableBoolean}, "
+            + "credit card statement issued={nullableBoolean}, "
+            + "amount lower bound={nullableAmount} "
+            + "and amount upper bound={nullableAmount}")
     public void retrieve_expenses(int pageNumber,
                                   int pageSize,
                                   String sortBy,
@@ -247,8 +249,9 @@ public class CucumberWhens extends CucumberStepDefinitions {
                                   LocalDate dateUpperBound,
                                   Boolean checked,
                                   Boolean paidWithCreditCardFilter,
-                                  Boolean creditCardStatementIssuedFilter
-    ) throws Exception {
+                                  Boolean creditCardStatementIssuedFilter,
+                                  BigDecimal amountLowerBound,
+                                  BigDecimal amountUpperBound) throws Exception {
         MockHttpServletRequestBuilder requestBuilder = get("/expenses")
                 .param("pageNumber", String.format("%d", pageNumber))
                 .param("pageSize", String.format("%d", pageSize))
@@ -289,6 +292,14 @@ public class CucumberWhens extends CucumberStepDefinitions {
 
         if (creditCardStatementIssuedFilter != null) {
             requestBuilder.param("creditCardStatementIssuedFilter", creditCardStatementIssuedFilter.toString());
+        }
+
+        if (amountLowerBound != null) {
+            requestBuilder.param("inclusiveAmountLowerBound", amountLowerBound.toString());
+        }
+
+        if (amountUpperBound != null) {
+            requestBuilder.param("inclusiveAmountUpperBound", amountUpperBound.toString());
         }
 
         if (state.getCurrentUserRequestPostProcessor() != null) {

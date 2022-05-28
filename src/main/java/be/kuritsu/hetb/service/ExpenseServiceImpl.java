@@ -191,6 +191,8 @@ public class ExpenseServiceImpl implements ExpenseService {
                 .creditCardStatementIssuedFilter(expenseListRequest.creditCardStatementIssuedFilter())
                 .inclusiveDateLowerBound(expenseListRequest.inclusiveDateLowerBound())
                 .inclusiveDateUpperBound(expenseListRequest.inclusiveDateUpperBound())
+                .inclusiveAmountLowerBound(expenseListRequest.inclusiveAmountLowerBound())
+                .inclusiveAmountUpperBound(expenseListRequest.inclusiveAmountUpperBound())
                 .checked(expenseListRequest.checked());
 
         PageRequest pageRequest;

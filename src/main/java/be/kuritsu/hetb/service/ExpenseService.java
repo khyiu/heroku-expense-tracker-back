@@ -1,5 +1,6 @@
 package be.kuritsu.hetb.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -51,6 +52,8 @@ public interface ExpenseService {
         private LocalDate inclusiveDateLowerBound;
         private LocalDate inclusiveDateUpperBound;
         private Boolean checked;
+        private BigDecimal inclusiveAmountLowerBound;
+        private BigDecimal inclusiveAmountUpperBound;
 
         public ExpenseListRequest(@NonNull Integer pageSize,
                                   @NonNull Integer pageNumber,

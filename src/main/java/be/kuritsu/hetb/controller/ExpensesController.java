@@ -5,6 +5,7 @@ import static be.kuritsu.hetb.config.SecurityConfig.ROLE_EXPENSE_TRACKER_USER;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -114,7 +115,9 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
                                                            Boolean creditCardStatementIssuedFilter,
                                                            LocalDate inclusiveDateLowerBound,
                                                            LocalDate inclusiveDateUpperBound,
-                                                           Boolean checked) {
+                                                           Boolean checked,
+                                                           BigDecimal inclusiveAmountLowerBound,
+                                                           BigDecimal inclusiveAmountUpperBound) {
         ExpenseService.ExpenseListRequest expenseListRequest = new ExpenseService.ExpenseListRequest(pageSize,
                                                                                                      pageNumber,
                                                                                                      ExpenseService.SortDirection.valueOf(sortDirection),
@@ -125,6 +128,8 @@ public class ExpensesController implements ExpensesApi, ExpenseApi {
                 .creditCardStatementIssuedFilter(creditCardStatementIssuedFilter)
                 .inclusiveDateLowerBound(inclusiveDateLowerBound)
                 .inclusiveDateUpperBound(inclusiveDateUpperBound)
+                .inclusiveAmountLowerBound(inclusiveAmountLowerBound)
+                .inclusiveAmountUpperBound(inclusiveAmountUpperBound)
                 .checked(checked);
 
         return ResponseEntity.ok(expenseService.getExpenses(expenseListRequest));
