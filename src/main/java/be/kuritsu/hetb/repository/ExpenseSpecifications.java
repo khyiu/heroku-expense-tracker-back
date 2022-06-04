@@ -73,13 +73,27 @@ public class ExpenseSpecifications implements Specification<Expense> {
         }
 
         if (paidWithCreditCardFilter != null) {
-            Predicate creditCardPredicate = criteriaBuilder.equal(root.get("paidWithCreditCard"), paidWithCreditCardFilter);
-            predicates.add(creditCardPredicate);
+            if (paidWithCreditCardFilter) {
+                Predicate creditCardPredicate = criteriaBuilder.equal(root.get("paidWithCreditCard"), paidWithCreditCardFilter);
+                predicates.add(creditCardPredicate);
+            } else {
+                Predicate creditCardPredicate = criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("paidWithCreditCard"), paidWithCreditCardFilter),
+                        criteriaBuilder.isNull(root.get("paidWithCreditCard")));
+                predicates.add(creditCardPredicate);
+            }
         }
 
         if (creditCardStatementIssuedFilter != null) {
-            Predicate statementPredicate = criteriaBuilder.equal(root.get("creditCardStatementIssued"), creditCardStatementIssuedFilter);
-            predicates.add(statementPredicate);
+            if (creditCardStatementIssuedFilter) {
+                Predicate statementPredicate = criteriaBuilder.equal(root.get("creditCardStatementIssued"), creditCardStatementIssuedFilter);
+                predicates.add(statementPredicate);
+            } else {
+                Predicate statementPredicate = criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("creditCardStatementIssued"), creditCardStatementIssuedFilter),
+                        criteriaBuilder.isNull(root.get("creditCardStatementIssued")));
+                predicates.add(statementPredicate);
+            }
         }
 
         if (inclusiveDateLowerBound != null) {
@@ -93,8 +107,15 @@ public class ExpenseSpecifications implements Specification<Expense> {
         }
 
         if (checked != null) {
-            Predicate checkedPredicate = criteriaBuilder.equal(root.get("checked"), checked);
-            predicates.add(checkedPredicate);
+            if (checked) {
+                Predicate checkedPredicate = criteriaBuilder.equal(root.get("checked"), checked);
+                predicates.add(checkedPredicate);
+            } else {
+                Predicate checkedPredicate = criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("checked"), checked),
+                        criteriaBuilder.isNull(root.get("checked")));
+                predicates.add(checkedPredicate);
+            }
         }
 
         if (inclusiveAmountLowerBound != null) {
