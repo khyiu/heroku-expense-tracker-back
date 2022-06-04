@@ -50,6 +50,97 @@ public class ExpenseSpecifications implements Specification<Expense> {
         Predicate ownerPredicate = criteriaBuilder.equal(root.get("owner"), ownerUsername);
         predicates.add(ownerPredicate);
 
+        addTagsPredicate(root, query, criteriaBuilder, predicates);
+        addDescriptionsPredicate(root, criteriaBuilder, predicates);
+        addPaidWithCreditCardPredicate(root, criteriaBuilder, predicates);
+        addCreditCardStatementIssuedPredicate(root, criteriaBuilder, predicates);
+        addDateRangePredicate(root, criteriaBuilder, predicates);
+        addCheckedPredicate(root, criteriaBuilder, predicates);
+        addAmountRangePredicate(root, criteriaBuilder, predicates);
+
+        return criteriaBuilder.and(predicates.toArray(new Predicate[] {}));
+    }
+
+    private void addAmountRangePredicate(Root<Expense> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (inclusiveAmountLowerBound != null) {
+            Predicate amountPredicate = criteriaBuilder.greaterThanOrEqualTo(root.get("amount"), inclusiveAmountLowerBound);
+            predicates.add(amountPredicate);
+        }
+
+        if (inclusiveAmountUpperBound != null) {
+            Predicate amountPredicate = criteriaBuilder.lessThanOrEqualTo(root.get("amount"), inclusiveAmountUpperBound);
+            predicates.add(amountPredicate);
+        }
+    }
+
+    private void addCheckedPredicate(Root<Expense> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (checked != null) {
+            String entityAttribute = "checked";
+            if (checked) {
+                Predicate checkedPredicate = criteriaBuilder.equal(root.get(entityAttribute), checked);
+                predicates.add(checkedPredicate);
+            } else {
+                Predicate checkedPredicate = criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get(entityAttribute), checked),
+                        criteriaBuilder.isNull(root.get(entityAttribute)));
+                predicates.add(checkedPredicate);
+            }
+        }
+    }
+
+    private void addDateRangePredicate(Root<Expense> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (inclusiveDateLowerBound != null) {
+            Predicate datePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get("date"), inclusiveDateLowerBound);
+            predicates.add(datePredicate);
+        }
+
+        if (inclusiveDateUpperBound != null) {
+            Predicate datePredicate = criteriaBuilder.lessThanOrEqualTo(root.get("date"), inclusiveDateUpperBound);
+            predicates.add(datePredicate);
+        }
+    }
+
+    private void addCreditCardStatementIssuedPredicate(Root<Expense> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (creditCardStatementIssuedFilter != null) {
+            String entityAttribute = "creditCardStatementIssued";
+            if (creditCardStatementIssuedFilter) {
+                Predicate statementPredicate = criteriaBuilder.equal(root.get(entityAttribute), creditCardStatementIssuedFilter);
+                predicates.add(statementPredicate);
+            } else {
+                Predicate statementPredicate = criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get(entityAttribute), creditCardStatementIssuedFilter),
+                        criteriaBuilder.isNull(root.get(entityAttribute)));
+                predicates.add(statementPredicate);
+            }
+        }
+    }
+
+    private void addPaidWithCreditCardPredicate(Root<Expense> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (paidWithCreditCardFilter != null) {
+            String entityAttribute = "paidWithCreditCard";
+            if (paidWithCreditCardFilter) {
+                Predicate creditCardPredicate = criteriaBuilder.equal(root.get(entityAttribute), paidWithCreditCardFilter);
+                predicates.add(creditCardPredicate);
+            } else {
+                Predicate creditCardPredicate = criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get(entityAttribute), paidWithCreditCardFilter),
+                        criteriaBuilder.isNull(root.get(entityAttribute)));
+                predicates.add(creditCardPredicate);
+            }
+        }
+    }
+
+    private void addDescriptionsPredicate(Root<Expense> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (!CollectionUtils.isEmpty(descriptionFilters)) {
+            descriptionFilters.forEach(descriptionFilter -> {
+                String likeCondition = "%" + StringUtils.stripAccents(descriptionFilter).toUpperCase(Locale.ROOT) + "%";
+                Predicate descriptionPredicate = criteriaBuilder.like(criteriaBuilder.upper(root.get("description")), likeCondition);
+                predicates.add(descriptionPredicate);
+            });
+        }
+    }
+
+    private void addTagsPredicate(Root<Expense> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
         if (!CollectionUtils.isEmpty(tagFilters)) {
             tagFilters.forEach(tagFilter -> {
                 Subquery<Tag> subquery = query.subquery(Tag.class);
@@ -63,71 +154,5 @@ public class ExpenseSpecifications implements Specification<Expense> {
                 predicates.add(hasTagPredicate);
             });
         }
-
-        if (!CollectionUtils.isEmpty(descriptionFilters)) {
-            descriptionFilters.forEach(descriptionFilter -> {
-                String likeCondition = "%" + StringUtils.stripAccents(descriptionFilter).toUpperCase(Locale.ROOT) + "%";
-                Predicate descriptionPredicate = criteriaBuilder.like(criteriaBuilder.upper(root.get("description")), likeCondition);
-                predicates.add(descriptionPredicate);
-            });
-        }
-
-        if (paidWithCreditCardFilter != null) {
-            if (paidWithCreditCardFilter) {
-                Predicate creditCardPredicate = criteriaBuilder.equal(root.get("paidWithCreditCard"), paidWithCreditCardFilter);
-                predicates.add(creditCardPredicate);
-            } else {
-                Predicate creditCardPredicate = criteriaBuilder.or(
-                        criteriaBuilder.equal(root.get("paidWithCreditCard"), paidWithCreditCardFilter),
-                        criteriaBuilder.isNull(root.get("paidWithCreditCard")));
-                predicates.add(creditCardPredicate);
-            }
-        }
-
-        if (creditCardStatementIssuedFilter != null) {
-            if (creditCardStatementIssuedFilter) {
-                Predicate statementPredicate = criteriaBuilder.equal(root.get("creditCardStatementIssued"), creditCardStatementIssuedFilter);
-                predicates.add(statementPredicate);
-            } else {
-                Predicate statementPredicate = criteriaBuilder.or(
-                        criteriaBuilder.equal(root.get("creditCardStatementIssued"), creditCardStatementIssuedFilter),
-                        criteriaBuilder.isNull(root.get("creditCardStatementIssued")));
-                predicates.add(statementPredicate);
-            }
-        }
-
-        if (inclusiveDateLowerBound != null) {
-            Predicate datePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get("date"), inclusiveDateLowerBound);
-            predicates.add(datePredicate);
-        }
-
-        if (inclusiveDateUpperBound != null) {
-            Predicate datePredicate = criteriaBuilder.lessThanOrEqualTo(root.get("date"), inclusiveDateUpperBound);
-            predicates.add(datePredicate);
-        }
-
-        if (checked != null) {
-            if (checked) {
-                Predicate checkedPredicate = criteriaBuilder.equal(root.get("checked"), checked);
-                predicates.add(checkedPredicate);
-            } else {
-                Predicate checkedPredicate = criteriaBuilder.or(
-                        criteriaBuilder.equal(root.get("checked"), checked),
-                        criteriaBuilder.isNull(root.get("checked")));
-                predicates.add(checkedPredicate);
-            }
-        }
-
-        if (inclusiveAmountLowerBound != null) {
-            Predicate amountPredicate = criteriaBuilder.greaterThanOrEqualTo(root.get("amount"), inclusiveAmountLowerBound);
-            predicates.add(amountPredicate);
-        }
-
-        if (inclusiveAmountUpperBound != null) {
-            Predicate amountPredicate = criteriaBuilder.lessThanOrEqualTo(root.get("amount"), inclusiveAmountUpperBound);
-            predicates.add(amountPredicate);
-        }
-
-        return criteriaBuilder.and(predicates.toArray(new Predicate[] {}));
     }
 }
