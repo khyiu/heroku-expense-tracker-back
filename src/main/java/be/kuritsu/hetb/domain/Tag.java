@@ -16,7 +16,6 @@ import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
@@ -33,7 +32,7 @@ public class Tag implements Comparable<Tag> {
     @Id
     private UUID id;
 
-    @Column(name = "value")
+    @Column(name = "\"value\"")
     private String value;
 
     @Column(name = "owner")
