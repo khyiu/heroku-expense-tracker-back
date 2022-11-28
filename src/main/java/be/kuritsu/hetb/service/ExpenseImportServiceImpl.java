@@ -1,7 +1,5 @@
 package be.kuritsu.hetb.service;
 
-import static be.kuritsu.hetb.service.ExpenseServiceConstants.LINE_FEED_SUBSTITUTION_CHARACTER;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,7 +81,7 @@ public class ExpenseImportServiceImpl implements ExpenseImportService {
 
         String expenseDescription = expenseMatcher.group("description");
         boolean paidWithCreditCard = Boolean.parseBoolean(expenseMatcher.group("creditCard"));
-        boolean creditCardStatementIssued = Boolean.parseBoolean(expenseMatcher.group("statementEmitted"));;
+        boolean creditCardStatementIssued = Boolean.parseBoolean(expenseMatcher.group("statementEmitted"));
         List<String> expenseTags = Arrays.stream(expenseMatcher.group("tags")
                                                   .split(","))
                 .map(StringUtils::stripAccents)
@@ -102,7 +100,7 @@ public class ExpenseImportServiceImpl implements ExpenseImportService {
                 .date(LocalDate.parse(expenseMatcher.group("date"), ExpenseConstants.EXPENSE_DATE_FORMATTER))
                 .amount(new BigDecimal(expenseMatcher.group("amount").replace(',', '.'))
                                 .setScale(2, RoundingMode.HALF_EVEN))
-                .description(expenseDescription == null ? null : StringUtils.replace(expenseDescription, String.valueOf(LINE_FEED_SUBSTITUTION_CHARACTER), "\n"))
+                .description(expenseDescription == null ? null : StringUtils.replace(expenseDescription, String.valueOf(ExpenseConstants.LINE_FEED_SUBSTITUTION_CHARACTER), "\n"))
                 .paidWithCreditCard(paidWithCreditCard)
                 .creditCardStatementIssued(creditCardStatementIssued)
                 .tags(tags);
