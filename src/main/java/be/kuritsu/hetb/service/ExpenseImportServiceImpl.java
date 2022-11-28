@@ -1,5 +1,7 @@
 package be.kuritsu.hetb.service;
 
+import static be.kuritsu.hetb.service.ExpenseServiceConstants.LINE_FEED_SUBSTITUTION_CHARACTER;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,6 +9,8 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,8 +35,7 @@ import be.kuritsu.hetb.security.SecurityContextService;
 public class ExpenseImportServiceImpl implements ExpenseImportService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExpenseImportServiceImpl.class);
-    private static final Pattern EXPENSE_LINE_PATTERN = Pattern.compile("^(?<date>.*);(?<amount>.*);(?<tag>.*);(?<description>.*)$");
-    private static final Pattern EXPENSE_DESCRIPTION_WITH_CREDIT_CARD_PATTERN = Pattern.compile("^(?<description>.*)\\[(.+):(?<creditCardIndicator>.*)\\]$");
+    private static final Pattern EXPENSE_LINE_PATTERN = Pattern.compile("(?<date>\\d{2}/\\d{2}/\\d{4});(?<amount>-?\\d+(\\.\\d{2})?);(?<tags>[^;]*);(?<description>[^;]*);(?<creditCard>true|false);(?<statementEmitted>true|false)");
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -79,35 +82,29 @@ public class ExpenseImportServiceImpl implements ExpenseImportService {
         }
 
         String expenseDescription = expenseMatcher.group("description");
-        boolean paidWithCreditCard = false;
-        boolean creditCardStatementIssued = false;
+        boolean paidWithCreditCard = Boolean.parseBoolean(expenseMatcher.group("creditCard"));
+        boolean creditCardStatementIssued = Boolean.parseBoolean(expenseMatcher.group("statementEmitted"));;
+        List<String> expenseTags = Arrays.stream(expenseMatcher.group("tags")
+                                                  .split(","))
+                .map(StringUtils::stripAccents)
+                .map(StringUtils::trim)
+                .toList();
 
-        Matcher descriptionWithCreditCardMatcher = EXPENSE_DESCRIPTION_WITH_CREDIT_CARD_PATTERN.matcher(expenseDescription);
-
-        if (descriptionWithCreditCardMatcher.matches()) {
-            expenseDescription = descriptionWithCreditCardMatcher.group("description");
-            paidWithCreditCard = true;
-
-            if (!descriptionWithCreditCardMatcher.group("creditCardIndicator").trim().equalsIgnoreCase("X")) {
-                creditCardStatementIssued = true;
-            }
-        }
-
-        String expenseTag = expenseMatcher.group("tag");
-
-        Tag tag = tagRepository.findByValueAndOwner(StringUtils.stripAccents(expenseTag), owner)
-                .map(tagFromDB -> new Tag()
-                        .id(tagFromDB.getId())
-                        .value(tagFromDB.getValue()))
-                .orElse(new Tag().value(expenseTag));
+        List<Tag> tags = expenseTags.stream()
+                .map(expenseTag -> tagRepository.findByValueAndOwner(StringUtils.stripAccents(expenseTag), owner)
+                        .map(tagFromDB -> new Tag()
+                                .id(tagFromDB.getId())
+                                .value(tagFromDB.getValue()))
+                        .orElse(new Tag().value(expenseTag)))
+                .toList();
 
         return new ExpenseRequest()
                 .date(LocalDate.parse(expenseMatcher.group("date"), ExpenseConstants.EXPENSE_DATE_FORMATTER))
                 .amount(new BigDecimal(expenseMatcher.group("amount").replace(',', '.'))
                                 .setScale(2, RoundingMode.HALF_EVEN))
-                .description(expenseDescription.trim())
+                .description(expenseDescription == null ? null : StringUtils.replace(expenseDescription, String.valueOf(LINE_FEED_SUBSTITUTION_CHARACTER), "\n"))
                 .paidWithCreditCard(paidWithCreditCard)
                 .creditCardStatementIssued(creditCardStatementIssued)
-                .addTagsItem(tag);
+                .tags(tags);
     }
 }

@@ -1,8 +1,11 @@
 package be.kuritsu.hetb.service;
 
+import static be.kuritsu.hetb.service.ExpenseServiceConstants.LINE_FEED_SUBSTITUTION_CHARACTER;
+
 import java.io.PrintStream;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -51,7 +54,7 @@ public class ExpenseExportServiceImpl implements ExpenseExportService {
                 .map(Tag::getValue)
                 .sorted(String::compareTo)
                 .collect(Collectors.joining(", "));
-        String description = expense.getDescription().trim();
+        String description = expense.getDescription() == null ? null : StringUtils.replace(expense.getDescription(), "\n", String.valueOf(LINE_FEED_SUBSTITUTION_CHARACTER));
         boolean paidWithCreditCard = Boolean.TRUE.equals(expense.getPaidWithCreditCard());
         boolean creditCardChecked = Boolean.TRUE.equals(expense.getCreditCardStatementIssued());
         String expenseLine = String.format("%s;%s;%s;%s;%b;%b",
