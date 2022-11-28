@@ -100,7 +100,7 @@ public class ExpenseImportServiceImpl implements ExpenseImportService {
                 .date(LocalDate.parse(expenseMatcher.group("date"), ExpenseConstants.EXPENSE_DATE_FORMATTER))
                 .amount(new BigDecimal(expenseMatcher.group("amount").replace(',', '.'))
                                 .setScale(2, RoundingMode.HALF_EVEN))
-                .description(expenseDescription == null ? null : StringUtils.replace(expenseDescription, String.valueOf(ExpenseConstants.LINE_FEED_SUBSTITUTION_CHARACTER), "\n"))
+                .description(StringUtils.isBlank(expenseDescription) ? null : StringUtils.replace(expenseDescription, String.valueOf(ExpenseConstants.LINE_FEED_SUBSTITUTION_CHARACTER), "\n"))
                 .paidWithCreditCard(paidWithCreditCard)
                 .creditCardStatementIssued(creditCardStatementIssued)
                 .tags(tags);

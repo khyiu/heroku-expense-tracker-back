@@ -87,7 +87,7 @@ public class CucumberThens extends CucumberStepDefinitions {
         assertThat(expenseListResponse.getItems()).hasSize(expectedNbExpenses);
     }
 
-    @Then("he/she receives a list of expenses containing at index {int} an expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {}, {} and {nullableBoolean}")
+    @Then("he/she receives a list of expenses containing at index {int} an expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {nullableString}, {}, {} and {nullableBoolean}")
     public void assertExpenseFromDashboard(int index,
                                            LocalDate date,
                                            BigDecimal amount,

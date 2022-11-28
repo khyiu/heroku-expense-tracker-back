@@ -52,7 +52,7 @@ public class ExpenseExportServiceImpl implements ExpenseExportService {
                 .map(Tag::getValue)
                 .sorted(String::compareTo)
                 .collect(Collectors.joining(", "));
-        String description = expense.getDescription() == null ? null : StringUtils.replace(expense.getDescription(), "\n", String.valueOf(ExpenseConstants.LINE_FEED_SUBSTITUTION_CHARACTER));
+        String description = expense.getDescription() == null ? "" : StringUtils.replace(expense.getDescription(), "\n", String.valueOf(ExpenseConstants.LINE_FEED_SUBSTITUTION_CHARACTER));
         boolean paidWithCreditCard = Boolean.TRUE.equals(expense.getPaidWithCreditCard());
         boolean creditCardChecked = Boolean.TRUE.equals(expense.getCreditCardStatementIssued());
         String expenseLine = String.format("%s;%s;%s;%s;%b;%b",
