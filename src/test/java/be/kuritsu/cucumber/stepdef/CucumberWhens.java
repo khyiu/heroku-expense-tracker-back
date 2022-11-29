@@ -149,7 +149,7 @@ public class CucumberWhens extends CucumberStepDefinitions {
         sendCreateExpenseRequest(expenseRequest);
     }
 
-    @When("he/she sends a request to register an expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {string}, {} and {}")
+    @When("he/she sends a request to register an expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {nullableString}, {} and {}")
     public void register_a_parameterized_expense(LocalDate date,
                                                  BigDecimal amount,
                                                  List<String> tags,

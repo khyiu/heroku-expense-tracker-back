@@ -32,8 +32,8 @@ Feature: Expense registration
     Then he gets a response with status 201
     And he receives the persisted expense with <date>, <amount>, <tags>, <description>, <paidWithCreditCard>, <creditCardStatementIssued> and <checked>
     Examples:
-      | date       | amount | tags            | description                    | paidWithCreditCard | creditCardStatementIssued | checked |
-      | 02/01/2021 | -15.00 | transport       | "Tickets STIB 10x"             | true               | false                     | null    |
-      | 02/01/2021 | -10.00 | bouffe          | "Glace"                        | false              | false                     | null    |
-      | 07/02/2021 | -3.50  | frais_bancaires | "Frais bancaires compte a vue" | false              | false                     | null    |
-      | 07/02/2021 | 50000  | lotto           | "Gains lotto"                  | false              | false                     | null    |
+      | date       | amount | tags            | description                  | paidWithCreditCard | creditCardStatementIssued | checked |
+      | 02/01/2021 | -15.00 | transport       | Tickets STIB 10x             | true               | false                     | null    |
+      | 02/01/2021 | -10.00 | bouffe          | Glace                        | false              | false                     | null    |
+      | 07/02/2021 | -3.50  | frais_bancaires | Frais bancaires compte a vue | false              | false                     | null    |
+      | 07/02/2021 | 50000  | lotto           | Gains lotto                  | false              | false                     | null    |

@@ -30,7 +30,7 @@ Feature: Expense edition
     Given an authenticated user, "John", with role "EXPENSE-TRACKER-USER"
     When he sends a request to edit the last expense created by "John" with 01/01/2010, 12.34, update_tags, "updated description", true and true
     Then he gets a response with status 200
-    And he receives the persisted expense with 01/01/2010, 12.34, update_tags, "updated description", true, true and null
+    And he receives the persisted expense with 01/01/2010, 12.34, update_tags, updated description, true, true and null
 
   Scenario: a non authenticated user updates the "checked" status of some expenses
     Given a non authenticated user
@@ -50,17 +50,17 @@ Feature: Expense edition
 
   Scenario: an authenticated user with sufficient permission updates the "checked" status of some expenses from another user
     Given an authenticated user, "Tony", with role "EXPENSE-TRACKER-USER"
-    Given he sends a request to register an expense with 21/04/2022, -7.50, lunch, "lunch @ work", false and false
+    Given he sends a request to register an expense with 21/04/2022, -7.50, lunch, lunch at work, false and false
     Given an authenticated user, "Katie", with role "EXPENSE-TRACKER-USER"
     When she updates the "checked" status of the last expense created by "Tony", to true
     Then she gets a response with status 403
 
   Scenario: an authenticated user with sufficient permission updates the "checked" status of some expenses
     Given an authenticated user, "Tony", with role "EXPENSE-TRACKER-USER"
-    Given he sends a request to register an expense with 21/04/2022, -7.50, lunch, "lunch @ work", false and false
+    Given he sends a request to register an expense with 21/04/2022, -7.50, lunch, lunch at work, false and false
     When he sends a request to retrieve the last expense created by "Tony"
-    Then he receives the persisted expense with 21/04/2022, -7.50, lunch, "lunch @ work", false, false and null
+    Then he receives the persisted expense with 21/04/2022, -7.50, lunch, lunch at work, false, false and null
     When he updates the "checked" status of the last expense created by "Tony", to true
     Then he gets a response with status 200
     When he sends a request to retrieve the last expense created by "Tony"
-    Then he receives the persisted expense with 21/04/2022, -7.50, lunch, "lunch @ work", false, false and true
+    Then he receives the persisted expense with 21/04/2022, -7.50, lunch, lunch at work, false, false and true

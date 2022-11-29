@@ -19,7 +19,7 @@ Feature: Export expenses
 
   Scenario: an authenticated user with sufficient permissions exports his/her expenses
     Given an authenticated user, "Tara", with role "EXPENSE-TRACKER-USER"
-    And she sends a request to register an expense with 01/05/2021, -3.50, frais_bancaire;Belfius, "frais de gestion compte à vue", false and false
+    And she sends a request to register an expense with 01/05/2021, -3.50, frais_bancaire;Belfius, frais de gestion compte a vue, false and false
     When she downloads her expenses
     Then she gets a response with status 200
     Then she receives an export file that contains "01/05/2021;-3.50;Belfius, frais_bancaire;frais de gestion compte a vue;false;false"
