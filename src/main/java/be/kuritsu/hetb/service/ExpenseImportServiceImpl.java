@@ -19,7 +19,6 @@ import javax.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import be.kuritsu.het.model.ExpenseRequest;
@@ -38,14 +37,15 @@ public class ExpenseImportServiceImpl implements ExpenseImportService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Autowired
-    private TagRepository tagRepository;
+    private final TagRepository tagRepository;
+    private final SecurityContextService securityContextService;
+    private final ExpenseService expenseService;
 
-    @Autowired
-    private SecurityContextService securityContextService;
-
-    @Autowired
-    private ExpenseService expenseService;
+    public ExpenseImportServiceImpl(TagRepository tagRepository, SecurityContextService securityContextService, ExpenseService expenseService) {
+        this.tagRepository = tagRepository;
+        this.securityContextService = securityContextService;
+        this.expenseService = expenseService;
+    }
 
     @Override
     public void importExpenses(InputStream importFileContent) {
