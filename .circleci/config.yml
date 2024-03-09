@@ -22,9 +22,6 @@ jobs:
       - run:
           name: Code analysis on SonarCloud
           command: mvn -DskipTests sonar:sonar
-      - run:
-          name: Deploy to Heroku
-          command: HEROKU_API_KEY="${HEROKU_API_KEY}" mvn heroku:deploy
 
 orbs:
   jira: circleci/jira@1.3.1
