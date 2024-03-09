@@ -39,5 +39,4 @@ workflows:
       - build-and-test:
           context: SonarCloud
           post-steps:
-            - jira/notify:
-                token_name: JIRA_TOKEN
+            - jira/notify
