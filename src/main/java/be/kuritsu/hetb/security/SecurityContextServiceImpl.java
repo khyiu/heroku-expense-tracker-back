@@ -1,8 +1,8 @@
 package be.kuritsu.hetb.security;
 
-import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 @Service("securityContextService")
@@ -10,10 +10,7 @@ public class SecurityContextServiceImpl implements SecurityContextService {
 
     @Override
     public String getAuthenticatedUserName() {
-        KeycloakAuthenticationToken keycloakAuthenticationToken = (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        SimpleKeycloakAccount keycloakAccount = (SimpleKeycloakAccount) keycloakAuthenticationToken.getDetails();
-        return keycloakAccount.getKeycloakSecurityContext()
-                .getToken()
-                .getPreferredUsername();
+        JwtAuthenticationToken authToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        return ((Jwt)authToken.getCredentials()).getClaimAsString("preferred_username");
     }
 }

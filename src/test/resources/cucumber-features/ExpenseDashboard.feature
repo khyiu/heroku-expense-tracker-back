@@ -3,8 +3,7 @@ Feature: Expense dashboard
   Scenario: a non authenticated user retrieves his expenses
     Given a non authenticated user
     When he sends a request to retrieve his expenses with page number=1, page size=1, sortBy=DATE, sortDirection=DESC, tag filters=null, description filters=null, date lower bound=null, date upper bound=null, checked status=null, paid with credit card=null, credit card statement issued=null, amount lower bound=null and amount upper bound=null
-    Then he gets a response with status 302
-    And response contains redirect URL "/sso/login"
+    Then he gets a response with status 401
 
   Scenario: an authenticated user with insufficient permissions retrieves his expenses
     Given an authenticated user, "Bob", with role "EXPENSE-TRACKER-TEST-USER"

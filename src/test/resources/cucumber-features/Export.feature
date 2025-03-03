@@ -4,7 +4,7 @@ Feature: Export expenses
   Scenario: a non authenticated user exports his/her expenses
     Given a non authenticated user
     When he downloads his expenses
-    Then he gets a response with status 302
+    Then he gets a response with status 401
 
   Scenario: an authenticated user with insufficient permissions exports his/her expenses
     Given an authenticated user, "Sarah", with role "EXPENSE-TRACKER-TEST-USER"

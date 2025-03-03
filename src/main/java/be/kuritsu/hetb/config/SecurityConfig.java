@@ -1,98 +1,96 @@
 package be.kuritsu.hetb.config;
 
+import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
+
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 
-import org.keycloak.adapters.RefreshableKeycloakSecurityContext;
-import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
-import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
-import org.keycloak.adapters.springsecurity.account.KeycloakRole;
-import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
-import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
-import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
-import org.keycloak.adapters.springsecurity.management.HttpSessionManager;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
-import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-@EnableGlobalMethodSecurity(securedEnabled = true)
-@KeycloakConfiguration
-public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true)
+public class SecurityConfig {
 
     public static final String ROLE_EXPENSE_TRACKER_USER = "ROLE_EXPENSE-TRACKER-USER";
     public static final String EXPENSE_TRACKER_ADMIN = "EXPENSE-TRACKER-ADMIN";
 
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder authenticationManagerBuilder) {
-        SimpleAuthorityMapper simpleAuthorityMapper = new SimpleAuthorityMapper();
-        simpleAuthorityMapper.setPrefix("");
-
-        KeycloakAuthenticationProvider keycloakAuthenticationProvider = new KeycloakAuthenticationProviderWrapper();
-        keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(simpleAuthorityMapper);
-        authenticationManagerBuilder.authenticationProvider(keycloakAuthenticationProvider);
+    public interface AuthoritiesConverter extends Converter<Map<String, Object>, Collection<GrantedAuthority>> {
     }
 
     @Bean
-    @Override
-    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-        return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
-    }
-
-    @Bean
-    @Override
-    @ConditionalOnMissingBean(HttpSessionManager.class)
-    protected HttpSessionManager httpSessionManager() {
-        return new HttpSessionManager();
-    }
-
-    // Ignore security hotspot about CSRF as this back-end API is intended to an Angular SPA that is deployed separately
-    @SuppressWarnings("java:S4502")
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
-        super.configure(httpSecurity);
-        httpSecurity.authorizeRequests()
-                .antMatchers("/actuator").hasRole(EXPENSE_TRACKER_ADMIN)
-                .antMatchers("/actuator/**").hasRole(EXPENSE_TRACKER_ADMIN)
-                .antMatchers("/**").fullyAuthenticated()
-                /*
-                 By default Spring security enables CSRF. As a consequence, a CSRF token need to be provided
-                 in PUT/POST/DELETE requests. If the token is missing or invalid, the request results in HTTP 403 error.
-                 Let's disable CSRF for the moment. We'll check later if it's worth switching it back on.
-                 */
-                .and()
-                .csrf().disable();
-    }
-
-    @Bean
-    public KeycloakSpringBootConfigResolver keycloakSpringBootConfigResolver() {
-        return new KeycloakSpringBootConfigResolver();
-    }
-
-    private static class KeycloakAuthenticationProviderWrapper extends KeycloakAuthenticationProvider {
-        @Override
-        public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-            KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) authentication;
-
-            SimpleKeycloakAccount keycloakAccount = (SimpleKeycloakAccount) token.getDetails();
-            RefreshableKeycloakSecurityContext keycloakSecurityContext = keycloakAccount.getKeycloakSecurityContext();
-            List<KeycloakRole> grantedAuthorities = keycloakSecurityContext
-                    .getToken()
-                    .getRealmAccess()
-                    .getRoles()
-                    .stream()
-                    .map(keycloakRole -> new KeycloakRole("ROLE_" + keycloakRole.toUpperCase()))
+    public AuthoritiesConverter realmRolesAuthoritiesConverter() {
+        return claims -> {
+            Optional<Map<String, Object>> realmAccess = Optional.ofNullable((Map<String, Object>) claims.get("realm_access"));
+            Optional<List<String>> roles = realmAccess.flatMap(map -> Optional.ofNullable((List<String>) map.get("roles")));
+            return roles.stream()
+                    .flatMap(Collection::stream)
+                    .map(role -> new SimpleGrantedAuthority(("ROLE_" + role).toUpperCase(Locale.ROOT)))
+                    .map(GrantedAuthority.class::cast)
                     .toList();
+        };
+    }
 
-            return new KeycloakAuthenticationToken(token.getAccount(), token.isInteractive(), grantedAuthorities);
+    @Bean
+    public JwtAuthenticationConverter authenticationConverter(Converter<Map<String, Object>, Collection<GrantedAuthority>> authoritiesConverter) {
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwt -> authoritiesConverter.convert(jwt.getClaims()));
+        return jwtAuthenticationConverter;
+    }
+
+    @Bean
+    public SecurityFilterChain webOAuth2FilterChain(final HttpSecurity httpSecurity,
+                                                    final Converter<Jwt, AbstractAuthenticationToken> authenticationConverter,
+                                                    final Environment environment) throws Exception {
+        httpSecurity.csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/actuator").hasRole(EXPENSE_TRACKER_ADMIN)
+                        .requestMatchers("/actuator/**").hasRole(EXPENSE_TRACKER_ADMIN)
+                        .requestMatchers("/**").authenticated())
+                .oauth2ResourceServer(resourceServer -> resourceServer.jwt(jwtDecoder -> jwtDecoder.jwtAuthenticationConverter(authenticationConverter)))
+                .cors(Customizer.withDefaults());
+
+        // when Spring "test" profile is active -> allow access to /h2-console URL
+        if (Arrays.stream(environment.getActiveProfiles()).toList().contains("test")) {
+            httpSecurity.authorizeHttpRequests(auth -> auth.requestMatchers(toH2Console()).permitAll())
+                    .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
         }
+
+        return httpSecurity
+                .build();
+    }
+
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedMethods(List.of("POST", "GET", "PUT", "DELETE"));
+        configuration.setAllowedHeaders(List.of("*"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
