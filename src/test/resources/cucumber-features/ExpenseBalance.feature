@@ -3,8 +3,7 @@ Feature: Expenses balance
   Scenario: a non authenticated user retrieves his expenses balance
     Given a non authenticated user
     When he sends a request to retrieve his expenses balance
-    Then he gets a response with status 302
-    And response contains redirect URL "/sso/login"
+    Then he gets a response with status 401
 
   Scenario: an authenticated user with insufficient permissions retrieves his expenses balance
     Given an authenticated user, "Bob", with role "EXPENSE-TRACKER-TEST-USER"

@@ -50,12 +50,6 @@ public class CucumberThens extends CucumberStepDefinitions {
         assertThat(state.getCurrentMvcResult().getResponse().getStatus()).isEqualTo(responseStatusCode);
     }
 
-    @Then("response contains redirect URL {string}")
-    public void assertRedirectURL(String redirectURL) {
-        assertThat(state.getCurrentMvcResult()).isNotNull();
-        assertThat(state.getCurrentMvcResult().getResponse().getRedirectedUrl()).isEqualTo(redirectURL);
-    }
-
     @Then("he receives the persisted expense with {nullableDate}, {nullableAmount}, {nullableStringList}, {nullableString}, {}, {} and {nullableBoolean}")
     public void assertPersistedExpense(LocalDate date,
                                        BigDecimal amount,

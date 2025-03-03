@@ -4,8 +4,7 @@ Feature: Expense edition
   Scenario: a non authenticated user edits an expense
     Given a non authenticated user
     When he sends a request to edit something in the expense with id="c35b6629-c516-42e5-a74f-5f8c5a65b1e9"
-    Then he gets a response with status 302
-    And response contains redirect URL "/sso/login"
+    Then he gets a response with status 401
 
   Scenario: an authenticated user with insufficient permission edits an expense
     Given an authenticated user, "Bob", with role "EXPENSE-TRACKER-TEST-USER"
@@ -35,8 +34,7 @@ Feature: Expense edition
   Scenario: a non authenticated user updates the "checked" status of some expenses
     Given a non authenticated user
     When he updates the "checked" status to true of expenses with ids=c35b6629-c516-42e5-a74f-5f8c5a65b1e9
-    Then he gets a response with status 302
-    And response contains redirect URL "/sso/login"
+    Then he gets a response with status 401
 
   Scenario: an authenticated user with insufficient permission updates the "checked" status of some expenses
     Given an authenticated user, "Bob", with role "EXPENSE-TRACKER-TEST-USER"

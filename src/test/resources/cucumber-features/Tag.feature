@@ -4,7 +4,7 @@ Feature: Tag handling
   Scenario: a non authenticated user retrieves his tags with no query
     Given a non authenticated user
     When he sends a request to retrieve his tags with query null
-    Then he gets a response with status 302
+    Then he gets a response with status 401
 
   Scenario: an authenticated user with insufficient permission retrieves his tags
     Given an authenticated user, "Ricky", with role "EXPENSE-TRACKER-TEST-USER"

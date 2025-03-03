@@ -4,8 +4,7 @@ Feature: Expense deletion
   Scenario: a non authenticated user deletes an expense
     Given a non authenticated user
     When he sends a request to delete the expense with id="c35b6629-c516-42e5-a74f-5f8c5a65b1e9"
-    Then he gets a response with status 302
-    And response contains redirect URL "/sso/login"
+    Then he gets a response with status 401
 
   Scenario: an authenticated user with insufficient permission deletes an expense
     Given an authenticated user, "Bob", with role "EXPENSE-TRACKER-TEST-USER"
