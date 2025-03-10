@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.mock.web.MockMultipartFile;
@@ -24,6 +25,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.MimeType;
+import org.springframework.web.context.WebApplicationContext;
 
 import be.kuritsu.cucumber.CucumberState;
 import be.kuritsu.het.model.ExpenseCheckedStatusRequest;
@@ -32,16 +34,22 @@ import be.kuritsu.het.model.ExpenseResponse;
 import be.kuritsu.het.model.Tag;
 import be.kuritsu.testutil.ExpenseRequestFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.cucumber.java.Before;
 import io.cucumber.java.en.When;
 
-public class CucumberWhens extends CucumberStepDefinitions {
+public class CucumberWhens {
 
     private final CucumberState state;
+    private final WebApplicationContext context;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public CucumberWhens(CucumberState state) {
+    public CucumberWhens(CucumberState state, WebApplicationContext context, ObjectMapper mapper) {
         this.state = state;
+        this.context = context;
+        this.objectMapper = mapper;
     }
 
     @Before

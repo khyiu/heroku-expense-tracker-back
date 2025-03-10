@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import be.kuritsu.het.model.ExpenseRequest;
 import be.kuritsu.het.model.ExpenseResponse;
