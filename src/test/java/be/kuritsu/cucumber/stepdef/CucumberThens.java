@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import be.kuritsu.cucumber.CucumberState;
 import be.kuritsu.het.model.ExpenseListResponse;
@@ -20,17 +21,24 @@ import be.kuritsu.het.model.Tag;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Then;
 
-public class CucumberThens extends CucumberStepDefinitions {
+public class CucumberThens {
 
     private final CucumberState state;
+    private final WebApplicationContext context;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public CucumberThens(CucumberState state) {
+    public CucumberThens(CucumberState state,
+                         WebApplicationContext context,
+                         ObjectMapper objectMapper) {
         this.state = state;
+        this.context = context;
+        this.objectMapper = objectMapper;
     }
 
     @Before

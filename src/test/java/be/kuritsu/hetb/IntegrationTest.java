@@ -1,18 +1,17 @@
 package be.kuritsu.hetb;
 
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import be.kuritsu.hetb.security.SecurityContextService;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("test")
 public abstract class IntegrationTest {
@@ -20,7 +19,7 @@ public abstract class IntegrationTest {
     @SpyBean
     public SecurityContextService securityContextService;
 
-    @Before
+    @BeforeEach
     public void initSecurityContextServiceSpy() {
         doReturn("testUser")
                 .when(securityContextService)

@@ -33,7 +33,7 @@
 
 		<api.version>89d26caaf8b976c3f184d5c5773314c1fd518629</api.version>
 
-		<cucumber.version>6.11.0</cucumber.version>
+		<cucumber.version>7.21.1</cucumber.version>
 		<org.mapstruct.version>1.5.1.Final</org.mapstruct.version>
 	</properties>
 
@@ -156,8 +156,20 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.junit</groupId>
+			<artifactId>junit-bom</artifactId>
+			<version>5.12.0</version>
+			<type>pom</type>
+			<scope>import</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-suite</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -181,7 +193,7 @@
 		</dependency>
 		<dependency>
 			<groupId>io.cucumber</groupId>
-			<artifactId>cucumber-junit</artifactId>
+			<artifactId>cucumber-junit-platform-engine</artifactId>
 			<version>${cucumber.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -340,7 +352,7 @@
 							<goal>report</goal>
 						</goals>
 						<configuration>
-							<formats>XML</formats>
+							<formats>XML,HTML</formats>
 						</configuration>
 					</execution>
 					<execution>
@@ -356,7 +368,7 @@
 							<goal>report-integration</goal>
 						</goals>
 						<configuration>
-							<formats>XML</formats>
+							<formats>XML,HTML</formats>
 						</configuration>
 					</execution>
 				</executions>
