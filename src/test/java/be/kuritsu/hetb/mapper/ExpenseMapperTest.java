@@ -17,18 +17,18 @@ import be.kuritsu.het.model.ExpenseResponse;
 import be.kuritsu.het.model.Tag;
 import be.kuritsu.hetb.domain.Expense;
 
-public class ExpenseMapperTest {
+class ExpenseMapperTest {
 
     private final ExpenseMapper expenseMapper = new ExpenseMapperImpl(new TagMapperImpl());
 
     @Test
-    public void test_expense_request_to_request_null_input() {
+    void test_expense_request_to_request_null_input() {
         Expense expense = expenseMapper.expenseRequestToRequest(null);
         assertThat(expense).isNull();
     }
 
     @Test
-    public void test_expense_request_to_request() {
+    void test_expense_request_to_request() {
         LocalDate expenseDate = LocalDate.of(2020, 12, 14);
         BigDecimal expenseAmount = BigDecimal.valueOf(123.45);
         String expenseDescription = "Some description";
@@ -63,13 +63,13 @@ public class ExpenseMapperTest {
     }
 
     @Test
-    public void test_expense_to_expense_response_null_input() {
+    void test_expense_to_expense_response_null_input() {
         ExpenseResponse expenseResponse = expenseMapper.expenseToExpenseResponse(null);
         assertThat(expenseResponse).isNull();
     }
 
     @Test
-    public void test_expense_to_expense_response() {
+    void test_expense_to_expense_response() {
         LocalDate date = LocalDate.of(2021, 9, 17);
         Expense expense = Expense.builder()
                 .id(UUID.randomUUID())

@@ -3,7 +3,6 @@ package be.kuritsu.cucumber;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;

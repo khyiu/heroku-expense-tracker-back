@@ -47,11 +47,11 @@ public class ExpenseRequestFactory {
         expenseRequest.setDate(date);
         expenseRequest.setAmount(amount);
         expenseRequest.setTags(tags == null ? Collections.emptyList() : tags.stream()
-                                       .map(tag -> new Tag().value(tag))
-                                       .collect(Collectors.toList()));
+                .map(tag -> new Tag().value(tag))
+                .collect(Collectors.toList()));
         expenseRequest.setDescription(lengthOfRandomDescription == 0 ?
                                               null :
-                                              RandomStringUtils.random(lengthOfRandomDescription));
+                                              RandomStringUtils.secureStrong().next(lengthOfRandomDescription));
 
         boolean paidWithCreditCard = ThreadLocalRandom.current().nextBoolean();
         expenseRequest.setPaidWithCreditCard(paidWithCreditCard);
@@ -101,6 +101,6 @@ public class ExpenseRequestFactory {
     private static String getRandomString(int minLength, int maxLength) {
         int randomStringLength = ThreadLocalRandom.current()
                 .nextInt(minLength, maxLength);
-        return RandomStringUtils.random(randomStringLength, true, true);
+        return RandomStringUtils.secureStrong().next(randomStringLength, true, true);
     }
 }
