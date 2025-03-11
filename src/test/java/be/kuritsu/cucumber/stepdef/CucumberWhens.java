@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.mock.web.MockMultipartFile;
@@ -71,14 +70,13 @@ public class CucumberWhens {
         }
 
         // replace specified tags with their persisted version when they exist
-        Map<String, Tag> persistedTags = state.getUserTags().computeIfAbsent(state.getCurrentUsername(), (key) -> new HashMap<>());
+        Map<String, Tag> persistedTags = state.getUserTags().computeIfAbsent(state.getCurrentUsername(), key -> new HashMap<>());
 
         if (!persistedTags.isEmpty()) {
             List<Tag> persistedTagsWhenAvailable = expenseRequest.getTags()
                     .stream()
                     .map(tag -> persistedTags.getOrDefault(tag.getValue(), tag))
-                    .collect(Collectors.toList());
-
+                    .toList();
             expenseRequest.setTags(persistedTagsWhenAvailable);
         }
 
@@ -220,7 +218,7 @@ public class CucumberWhens {
                 .tags(
                         tags.stream()
                                 .map(tagValue -> new Tag().value(tagValue))
-                                .collect(Collectors.toList())
+                                .toList()
                 )
                 .description(description)
                 .paidWithCreditCard(paidWithCreditCard)

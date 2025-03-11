@@ -7,7 +7,6 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -75,7 +74,7 @@ public class CucumberThens {
         assertThat(expenseResponse.getTags()
                            .stream()
                            .map(Tag::getValue)
-                           .collect(Collectors.toList()))
+                           .toList())
                 .containsExactlyElementsOf(tags);
         assertThat(expenseResponse.getDescription()).isEqualTo(description);
         assertThat(expenseResponse.getPaidWithCreditCard()).isEqualTo(paidWithCreditCard);
@@ -107,7 +106,7 @@ public class CucumberThens {
         assertThat(expenseResponse.getTags()
                            .stream()
                            .map(Tag::getValue)
-                           .collect(Collectors.toList()))
+                           .toList())
                 .containsExactlyElementsOf(tags);
         assertThat(expenseResponse.getDescription()).isEqualTo(description);
         assertThat(expenseResponse.getPaidWithCreditCard()).isEqualTo(paidWithCreditCard);

@@ -13,7 +13,7 @@ import be.kuritsu.hetb.service.BalanceService;
 import be.kuritsu.hetb.service.ExpenseService;
 import be.kuritsu.testutil.ExpenseRequestFactory;
 
-public class UserBalanceIntegrationTest extends IntegrationTest {
+class UserBalanceIntegrationTest extends IntegrationTest {
 
     @SpyBean
     private BalanceService balanceService;
@@ -22,7 +22,7 @@ public class UserBalanceIntegrationTest extends IntegrationTest {
     private ExpenseService expenseService;
 
     @Test
-    public void test_user_balance_caching () {
+    void test_user_balance_caching () {
         balanceService.getBalance();
         verify(balanceService, new Times(1)).getBalance();
 
