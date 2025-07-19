@@ -238,18 +238,6 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>com.heroku.sdk</groupId>
-				<artifactId>heroku-maven-plugin</artifactId>
-				<version>3.0.4</version>
-				<configuration>
-					<appName>heroku-expense-tracker-back</appName>
-					<jdkVersion>17</jdkVersion>
-					<processTypes>
-						<web>java $JAVA_OPTS -cp target/classes:target/dependency/* be.kuritsu.hetb.HerokuExpenseTrackerBackApplication -Dspring.profiles.active=heroku</web>
-					</processTypes>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>3.2.0</version>
