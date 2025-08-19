@@ -23,6 +23,19 @@ jobs:
           name: Code analysis on SonarCloud
           command: mvn -DskipTests sonar:sonar
 
+  build-and-publish-docker-image:
+    docker:
+      - image: cimg/openjdk:17.0.2
+    steps:
+      - run:
+          name: Build and publish Docker image (main branch only)
+          command: |
+            if [ "${CIRCLE_BRANCH}" = "main" ]; then
+              mvn jib:build -Pci -Djib.to.auth.username=$DOCKER_HUB_USERNAME -Djib.to.auth.password=$DOCKER_HUB_PASSWORD
+            else
+              echo "Skipping Docker build and publish - not on main branch"
+            fi
+
 orbs:
   jira: circleci/jira@1.3.1
 
@@ -37,3 +50,6 @@ workflows:
           context: SonarCloud
           post-steps:
             - jira/notify
+      - build-and-publish-docker-image:
+          requires:
+            - build-and-test
