@@ -13,9 +13,7 @@ jobs:
       - image: cimg/openjdk:17.0.2
     working_directory: ~/build-workdir
     steps:
-      # Checkout the code as the first step.
       - checkout
-      # Use mvn clean and package as the standard maven build phase
       - run:
           name: Build and tests (unit + integration)
           command: mvn clean verify
@@ -27,11 +25,12 @@ jobs:
     docker:
       - image: cimg/openjdk:17.0.2
     steps:
+      - checkout
       - run:
           name: Build and publish Docker image (main branch only)
           command: |
             if [ "${CIRCLE_BRANCH}" = "main" ]; then
-              mvn jib:build -Pci -Djib.to.auth.username=$DOCKER_HUB_USERNAME -Djib.to.auth.password=$DOCKER_HUB_PASSWORD
+              mvn clean compile jib:build -Pci -Djib.to.auth.username=$DOCKER_HUB_USERNAME -Djib.to.auth.password=$DOCKER_HUB_PASSWORD
             else
               echo "Skipping Docker build and publish - not on main branch"
             fi
@@ -44,7 +43,7 @@ workflows:
   # Inside the workflow, you provide the jobs you want to run, e.g this workflow runs the build-and-test job above.
   # CircleCI will run this workflow on every commit.
   # For more details on extending your workflow, see the configuration docs: https://circleci.com/docs/2.0/configuration-reference/#workflows
-  sample:
+  build:
     jobs:
       - build-and-test:
           context: SonarCloud
