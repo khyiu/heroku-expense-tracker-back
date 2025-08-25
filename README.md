@@ -283,3 +283,61 @@ keycloak.cors=true
 When CORS is enabled, the Angular HTTP client needs to be told by the server, what response headers should be made available.  
 In order to make the `content-disposition` header available, we have to add the `Access-Control-Expose-Headers` response header with
 value = _content-disposition_
+
+### 13 Have Circle CI build and publish Docker image
+
+1. In `pom.xml`, use `jib-maven-plugin` to build the docker image. The image number version is derived from the Maven project version, and the plugin only executes    
+    when `ci` Maven profile is activated -> execution restricted to CI server.
+
+  ``` xml
+   <profiles>
+		<profile>
+			<id>ci</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.google.cloud.tools</groupId>
+						<artifactId>jib-maven-plugin</artifactId>
+						<version>3.4.6</version>
+						<configuration>
+							<to>
+								<image>kyiu/expense-tracker-backend:${project.version}</image>
+							</to>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>build</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+   ```
+2. In Circle CI `heroku-expense-tracker-back` project settings, add 2 environment variables to hold the Docker Hub credentials: 
+    
+    ![Circle CI environment variables for Docker Hub](doc/circle-ci-docker-env-variables.png)
+3. In `.circleci/config.yml` define a new job that executes a Maven command to use `jib-maven-plugin` to build and publish the Docker image.  
+    This command only executes when build is triggered on `main` branch. 
+
+``` yaml
+  build-and-publish-docker-image:
+    docker:
+      - image: cimg/openjdk:17.0.2
+    steps:
+      - checkout
+      - run:
+          name: Build and publish Docker image (main branch only)
+          command: |
+            if [ "${CIRCLE_BRANCH}" = "main" ]; then
+              mvn clean compile jib:build -Pci -Djib.to.auth.username=$DOCKER_HUB_USERNAME -Djib.to.auth.password=$DOCKER_HUB_PASSWORD
+            else
+              echo "Skipping Docker build and publish - not on main branch"
+            fi
+```
+
+4. Add execution of this new job to the `build` workflow
