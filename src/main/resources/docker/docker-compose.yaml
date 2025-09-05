@@ -15,9 +15,30 @@ services:
     networks:
       - postgres
     restart: unless-stopped
-
-
+  expense-tracker-back:
+    container_name: expense-tracker-back
+    image: kyiu/expense-tracker-backend:2.4.0-SNAPSHOT
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/postgres
+      - JAVA_OPTS=-Ddb.url=jdbc:postgresql://postgres:5432/postgres -Ddb.user=postgres -Ddb.password=changeme
+    ports:
+      - "8080:8080"
+    networks:
+      - postgres
+    restart: unless-stopped
+  expense-tracker-front:
+    container_name: expense-tracker-front
+    image: kyiu/expense-tracker-frontend:1.0.1-rc2
+    ports:
+      - "80:80"
+    networks:
+      - postgres
+    restart: unless-stopped
 
 networks:
   postgres:
     driver: bridge
+
+volumes:
+  postgres:
