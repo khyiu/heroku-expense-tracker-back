@@ -85,7 +85,7 @@ public class SecurityConfig {
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:80", "http://postgres:80"));
+        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://expense-tracker-front:80"));
         configuration.setAllowedMethods(List.of("POST", "GET", "PUT", "DELETE", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
 
