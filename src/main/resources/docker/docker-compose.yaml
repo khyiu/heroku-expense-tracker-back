@@ -17,7 +17,7 @@ services:
     restart: unless-stopped
   expense-tracker-back:
     container_name: expense-tracker-back
-    image: kyiu/expense-tracker-backend:2.6.0-SNAPSHOT
+    image: kyiu/expense-tracker-backend:2.11.0-SNAPSHOT
     environment:
       - SPRING_PROFILES_ACTIVE=local
       - DATABASE_URL=jdbc:postgresql://postgres:5432/postgres
