@@ -5,7 +5,7 @@ version: 2.1
 jobs:
   build-and-test:
     docker:
-      - image: cimg/openjdk:17.0.2
+      - image: cimg/openjdk:24.0.2
     working_directory: ~/build-workdir
     steps:
       - checkout
@@ -18,7 +18,7 @@ jobs:
 
   build-and-publish-docker-image:
     docker:
-      - image: cimg/openjdk:17.0.2
+      - image: cimg/openjdk:24.0.2
     steps:
       - checkout
       - run:
