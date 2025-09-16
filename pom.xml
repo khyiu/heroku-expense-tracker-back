@@ -380,6 +380,9 @@
 							<to>
 								<image>kyiu/expense-tracker-backend:${project.version}</image>
 							</to>
+							<container>
+								<mainClass>be.kuritsu.hetb.HerokuExpenseTrackerBackApplication</mainClass>
+							</container>
 						</configuration>
 						<executions>
 							<execution>
